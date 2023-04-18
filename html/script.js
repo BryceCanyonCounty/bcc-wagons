@@ -68,18 +68,23 @@ window.addEventListener('message', function(event) {
             const wagonModel = tab.model;
             $('#page_mywagons .scroll-container .collapsible').append(`
                 <li>
-                    <div id="heads" class="collapsible-header col s12 panel">
+                    <div id="${wagonId}" class="collapsible-header col s12 panel">
                         <div class="col s12 panel-title">
-                            <h6 class="grey-text plus" onclick="Select(${wagonId}, '${wagonModel}')">${wagonName}</h6>
+                            <h6 class="grey-text plus" onclick="Select(${wagonId})">${wagonName}</h6>
                         </div>
                     </div>
-                    <div class="collapsible-body col s12 panel-mywagon item" id="${wagonId}">
+                    <div class="collapsible-body col s12 panel-mywagon item">
                         <button class="col s4 panel-col item-mywagon" onclick="Rename(${wagonId})">Rename</button>
                         <button class="col s4 panel-col item-mywagon" onclick="Spawn(${wagonId}, '${wagonModel}', '${wagonName}')">Spawn</button>
                         <button class="col s4 panel-col item-mywagon" onclick="Sell(${wagonId}, '${wagonModel}')">Sell</button>
                     </div>
                 </li>
             `);
+            $(`#page_mywagons .scroll-container .collapsible #${wagonId}`).hover(function() {  
+                $(this).click(function() {
+                    $.post('http://oss_wagons/LoadMyWagon', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel}));
+                });                         
+            }, function() {});
         };
     };
 });
@@ -95,8 +100,7 @@ function BuyWagon(modelW, price, isCash) {
     };
 };
 
-function Select(wagonId, wagonModel) {    
-    $.post('http://oss_wagons/LoadMyWagon', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel }));
+function Select(wagonId) {
     $.post('http://oss_wagons/SelectWagon', JSON.stringify({WagonId: wagonId}));
 };
 

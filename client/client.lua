@@ -254,6 +254,12 @@ end)
 -- Open Main Menu
 function OpenMenu(shopId)
     InMenu = true
+
+    if MyWagon ~= 0 then
+        DeleteEntity(MyWagon)
+        MyWagon = 0
+    end
+
     ShopId = shopId
     local shopConfig = Config.wagonShops[ShopId]
     ShopName = shopConfig.shopName
@@ -287,10 +293,6 @@ RegisterNUICallback("LoadWagon", function(data)
         DeleteEntity(MyWagon_entity)
         MyWagon_entity = nil
     end
-    if Showroom_entity ~= nil then
-        DeleteEntity(Showroom_entity)
-        Showroom_entity = nil
-    end
 
     local model = joaat(data.WagonModel)
     RequestModel(model)
@@ -299,10 +301,16 @@ RegisterNUICallback("LoadWagon", function(data)
         Citizen.Wait(100)
     end
 
+    if Showroom_entity ~= nil then
+        DeleteEntity(Showroom_entity)
+        Showroom_entity = nil
+    end
+
     local shopConfig = Config.wagonShops[ShopId]
     Showroom_entity = CreateVehicle(model, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, Showroom_entity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, Showroom_entity, true) -- FreezeEntityPosition
+    SetModelAsNoLongerNeeded(model)
 end)
 
 -- Buy and Name New Wagons
@@ -363,10 +371,6 @@ RegisterNUICallback("LoadMyWagon", function(data)
         DeleteEntity(Showroom_entity)
         Showroom_entity = nil
     end
-    if MyWagon_entity ~= nil then
-        DeleteEntity(MyWagon_entity)
-        MyWagon_entity = nil
-    end
 
     local model = joaat(data.WagonModel)
     RequestModel(model)
@@ -375,10 +379,16 @@ RegisterNUICallback("LoadMyWagon", function(data)
         Citizen.Wait(100)
     end
 
+    if MyWagon_entity ~= nil then
+        DeleteEntity(MyWagon_entity)
+        MyWagon_entity = nil
+    end
+
     local shopConfig = Config.wagonShops[ShopId]
     MyWagon_entity = CreateVehicle(model, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, MyWagon_entity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyWagon_entity, true) -- FreezeEntityPosition
+    SetModelAsNoLongerNeeded(model)
 end)
 
 -- Spawn Player Owned Wagons

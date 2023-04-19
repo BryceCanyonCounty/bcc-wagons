@@ -69,8 +69,8 @@ window.addEventListener('message', function(event) {
             $('#page_mywagons .scroll-container .collapsible').append(`
                 <li>
                     <div class="collapsible-header col s12 panel">
-                        <div class="col s12 panel-title">
-                            <h6 class="grey-text plus" onclick="Select(${wagonId}, '${wagonModel}')">${wagonName}</h6>
+                        <div class="col s12 panel-title" onclick="Select(${wagonId}, '${wagonModel}')">
+                            <h6 class="grey-text plus" >${wagonName}</h6>
                         </div>
                     </div>
                     <div class="collapsible-body col s12 panel-mywagon item">
@@ -108,7 +108,7 @@ function Rename(wagonId) {
 };
 
 function Spawn(wagonId, wagonModel, wagonName) {    
-    $.post('http://oss_wagons/SetMyWagonInfo', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel, WagonName: wagonName }));
+    $.post('http://oss_wagons/SpawnInfo', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel, WagonName: wagonName }));
     $('#page_mywagons .scroll-container .collapsible').html('');
     $('#page_shop .scroll-container .collapsible').html('');
     $("#creatormenu").fadeOut(1000);

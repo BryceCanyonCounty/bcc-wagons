@@ -14,8 +14,6 @@ local ShopName
 local Showroom_entity
 local MyWagon_entity
 local MyWagon = 0
-local WagonModel
-local WagonName
 local MyWagonId
 local WagonCam
 local CallTimer = false
@@ -272,8 +270,8 @@ end
 
 -- Get Wagon Data for Purchases
 function GetShopData()
-    local ret = Config.wagonShops[ShopId].wagons
-    return ret
+    local shopWagons = Config.wagonShops[ShopId].wagons
+    return shopWagons
 end
 
 -- Get Wagon Data for Players Wagons
@@ -289,25 +287,20 @@ RegisterNUICallback("LoadWagon", function(data)
         DeleteEntity(MyWagon_entity)
         MyWagon_entity = nil
     end
-
-    local wagonModel = data.wagonModel
-    local modelHash = joaat(wagonModel)
-    if IsModelValid(modelHash) then
-        if not HasModelLoaded(modelHash) then
-            RequestModel(modelHash)
-            while not HasModelLoaded(modelHash) do
-                Citizen.Wait(10)
-            end
-        end
-    end
-
     if Showroom_entity ~= nil then
         DeleteEntity(Showroom_entity)
         Showroom_entity = nil
     end
 
+    local model = joaat(data.WagonModel)
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Citizen.Wait(100)
+    end
+
     local shopConfig = Config.wagonShops[ShopId]
-    Showroom_entity = CreateVehicle(modelHash, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, false, false)
+    Showroom_entity = CreateVehicle(model, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, Showroom_entity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, Showroom_entity, true) -- FreezeEntityPosition
 end)
@@ -319,7 +312,7 @@ RegisterNUICallback("BuyWagon", function(data)
 end)
 
 RegisterNetEvent('oss_wagons:SetWagonName')
-AddEventHandler('oss_wagons:SetWagonName', function(data, action)
+AddEventHandler('oss_wagons:SetWagonName', function(data, rename)
     SendNUIMessage({ action = "hide" })
     SetNuiFocus(false, false)
     Wait(200)
@@ -334,10 +327,9 @@ AddEventHandler('oss_wagons:SetWagonName', function(data, action)
 		end
 		if (GetOnscreenKeyboardResult()) then
             wagonName = GetOnscreenKeyboardResult()
-            if action == "newWagon" then
+            if not rename then
                 TriggerServerEvent('oss_wagons:SaveNewWagon', data, wagonName)
-
-            elseif action == "rename" then
+            else
                 TriggerServerEvent('oss_wagons:UpdateWagonName', data, wagonName)
             end
 
@@ -356,11 +348,11 @@ end)
 
 -- Rename Owned Wagon
 RegisterNUICallback("RenameWagon", function(data)
-    local action = "rename"
-    TriggerEvent('oss_wagons:SetWagonName', data, action)
+    local rename = true
+    TriggerEvent('oss_wagons:SetWagonName', data, rename)
 end)
 
--- Select Active Horse
+-- Select Active Wagon
 RegisterNUICallback("SelectWagon", function(data)
     TriggerServerEvent('oss_wagons:SelectWagon', tonumber(data.WagonId))
 end)
@@ -376,63 +368,54 @@ RegisterNUICallback("LoadMyWagon", function(data)
         MyWagon_entity = nil
     end
 
-    local wagonModel = data.WagonModel
-    local modelHash = joaat(wagonModel)
-    if not HasModelLoaded(modelHash) then
-        RequestModel(modelHash)
-        while not HasModelLoaded(modelHash) do
-            Citizen.Wait(10)
-        end
+    local model = joaat(data.WagonModel)
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Citizen.Wait(100)
     end
 
     local shopConfig = Config.wagonShops[ShopId]
-    MyWagon_entity = CreateVehicle(modelHash, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, false, false)
+    MyWagon_entity = CreateVehicle(model, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, MyWagon_entity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyWagon_entity, true) -- FreezeEntityPosition
 end)
 
-RegisterNetEvent('oss_wagons:SetWagonInfo')
-AddEventHandler('oss_wagons:SetWagonInfo', function(model, name, menuSpawn, id)
-    WagonModel = model
-    WagonName = name
-    MyWagonId = id
-    print("WagonInfo Set")
-    SpawnWagon(menuSpawn)
-end)
-
 -- Spawn Player Owned Wagons
-RegisterNUICallback("SetWagonInfo", function(data)
-    local myWagonModel = data.WagonModel
-    local myWagonName = data.WagonName
-    local wagonId = data.WagonId
+RegisterNUICallback("SpawnInfo", function(data)
     local menuSpawn = true
-    TriggerEvent('oss_wagons:SetWagonInfo', myWagonModel, myWagonName, menuSpawn, wagonId)
+    TriggerEvent('oss_wagons:SpawnWagon', data.WagonModel, data.WagonName, menuSpawn, data.WagonId)
 end)
 
-function SpawnWagon(menuSpawn)
+RegisterNetEvent('oss_wagons:SpawnWagon')
+AddEventHandler('oss_wagons:SpawnWagon', function(wagonModel, name, menuSpawn, id)
+    local player = PlayerPedId()
+    MyWagonId = id
+
     if MyWagon ~= 0 then
         DeleteEntity(MyWagon)
         MyWagon = 0
     end
-    local player = PlayerPedId()
 
-    RequestModel(WagonModel)
-    while not HasModelLoaded(WagonModel) do
-        Wait(100)
+    local model = joaat(wagonModel)
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Citizen.Wait(100)
     end
 
-    if menuSpawn == true then
+    if menuSpawn then
         local shopConfig = Config.wagonShops[ShopId]
-        MyWagon = CreateVehicle(WagonModel, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, true, false)
+        MyWagon = CreateVehicle(model, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, true, false)
         SetVehicleOnGroundProperly(MyWagon)
-        SetModelAsNoLongerNeeded(WagonModel)
+        SetModelAsNoLongerNeeded(model)
         DoScreenFadeOut(500)
         Wait(500)
         SetPedIntoVehicle(player, MyWagon, -1)
         Wait(500)
         DoScreenFadeIn(500)
 
-    elseif menuSpawn == false then
+    else
         local pCoords = GetEntityCoords(player)
         local spawnPosition
         local x, y, z = table.unpack(pCoords)
@@ -449,9 +432,9 @@ function SpawnWagon(menuSpawn)
         end
         spawnPosition = nodePosition
 
-        MyWagon = CreateVehicle(WagonModel, spawnPosition, GetEntityHeading(player), true, false)
+        MyWagon = CreateVehicle(model, spawnPosition, GetEntityHeading(player), true, false)
         SetVehicleOnGroundProperly(MyWagon)
-        SetModelAsNoLongerNeeded(WagonModel)
+        SetModelAsNoLongerNeeded(model)
 
         TaskGoToEntity(MyWagon, player, -1, 7.2, 2.0, 0, 0)
     end
@@ -459,16 +442,14 @@ function SpawnWagon(menuSpawn)
 
     local wagonBlip = Citizen.InvokeNative(0x23F74C2FDA6E7C61, -1749618580, MyWagon) -- BlipAddForEntity
     SetBlipSprite(wagonBlip, joaat("blip_mp_player_wagon"), true)
-    Citizen.InvokeNative(0x9CB1A1623062F402, wagonBlip, WagonName) -- SetBlipName
-end
+    Citizen.InvokeNative(0x9CB1A1623062F402, wagonBlip, name) -- SetBlipName
+end)
 
 -- Sell Player Owned Wagons
 RegisterNUICallback("SellWagon", function(data)
     DeleteEntity(MyWagon_entity)
 
-    local wagonId = tonumber(data.WagonId)
-    local wagonName = data.WagonName
-    TriggerServerEvent('oss_wagons:SellWagon', wagonId, wagonName, ShopId)
+    TriggerServerEvent('oss_wagons:SellWagon', tonumber(data.WagonId), data.WagonName, ShopId)
 end)
 
 -- Close Main Menu
@@ -514,8 +495,7 @@ Citizen.CreateThread(function()
         Citizen.Wait(1)
         -- Call Wagon (key: J)
         if Citizen.InvokeNative(0x580417101DDB492F, 2, 0xF3830D8E) then -- IsControlJustPressed
-            print("Pressed J")
-            CallCheck()
+            CallWagon()
         end
         -- Open Inventory (key: U)
         if Citizen.InvokeNative(0x580417101DDB492F, 2, 0xD8F73058) then -- IsControlJustPressed
@@ -525,21 +505,7 @@ Citizen.CreateThread(function()
 end)
 
 -- Call Selected Wagon
-function CallCheck()
-    print("Enter CallCheck")
-    if not CallTimer then
-        CallWagon()
-        print("call CallWagon")
-        CallTimer = true
-        Wait(5000)
-        CallTimer = false
-    else
-        return
-    end
-end
-
 function CallWagon()
-    print("enter CallWagon")
     local player = PlayerPedId()
     if MyWagon ~= 0 then
         if GetScriptTaskStatus(MyWagon, 0x4924437D, 0) ~= 0 then
@@ -556,7 +522,6 @@ function CallWagon()
         end
     else
         TriggerServerEvent('oss_wagons:GetSelectedWagon')
-        print("Trigger Server")
     end
 end
 
@@ -573,13 +538,12 @@ end
 
 -- Return Wagon Using Prompt at Shop Location
 function ReturnWagon()
-    if MyWagon == 0 then
-        VORPcore.NotifyRightTip(_U("noWagon"), 5000)
-
-    elseif MyWagon ~=0 then
+    if MyWagon ~= 0 then
         DeleteEntity(MyWagon)
         MyWagon = 0
         VORPcore.NotifyRightTip(_U("wagonReturned"), 5000)
+    else
+        VORPcore.NotifyRightTip(_U("noWagon"), 5000)
     end
 end
 
@@ -607,15 +571,13 @@ RegisterNUICallback("Rotate", function(data)
 end)
 
 function Rotation(dir)
-    local ownedWagon = MyWagon_entity
-    local shopWagon = Showroom_entity
-    if ownedWagon then
-        local ownedRot = GetEntityHeading(ownedWagon) + dir
-        SetEntityHeading(ownedWagon, ownedRot % 360)
+    if MyWagon_entity then
+        local ownedRot = GetEntityHeading(MyWagon_entity) + dir
+        SetEntityHeading(MyWagon_entity, ownedRot % 360)
 
-    elseif shopWagon then
-        local shopRot = GetEntityHeading(shopWagon) + dir
-        SetEntityHeading(shopWagon, shopRot % 360)
+    elseif Showroom_entity then
+        local shopRot = GetEntityHeading(Showroom_entity) + dir
+        SetEntityHeading(Showroom_entity, shopRot % 360)
     end
 end
 

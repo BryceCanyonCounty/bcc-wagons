@@ -50,7 +50,7 @@ window.addEventListener('message', function(event) {
                             $('.selected').removeClass("selected"); 
                             ModelWagon = $(this).attr('id');                       
                             $(this).addClass('selected');
-                            $.post('http://oss_wagons/LoadWagon', JSON.stringify({wagonModel: $(this).attr('id')}));
+                            $.post('http://oss_wagons/LoadWagon', JSON.stringify({WagonModel: $(this).attr('id')}));
                         });                       
                     }, function() {});
                 };
@@ -68,23 +68,18 @@ window.addEventListener('message', function(event) {
             const wagonModel = tab.model;
             $('#page_mywagons .scroll-container .collapsible').append(`
                 <li>
-                    <div id="${wagonId}" class="collapsible-header col s12 panel">
+                    <div class="collapsible-header col s12 panel">
                         <div class="col s12 panel-title">
-                            <h6 class="grey-text plus" onclick="Select(${wagonId})">${wagonName}</h6>
+                            <h6 class="grey-text plus" onclick="Select(${wagonId}, '${wagonModel}')">${wagonName}</h6>
                         </div>
                     </div>
                     <div class="collapsible-body col s12 panel-mywagon item">
                         <button class="col s4 panel-col item-mywagon" onclick="Rename(${wagonId})">Rename</button>
                         <button class="col s4 panel-col item-mywagon" onclick="Spawn(${wagonId}, '${wagonModel}', '${wagonName}')">Spawn</button>
-                        <button class="col s4 panel-col item-mywagon" onclick="Sell(${wagonId}, '${wagonModel}')">Sell</button>
+                        <button class="col s4 panel-col item-mywagon" onclick="Sell(${wagonId}, '${wagonModel}', '${wagonName}')">Sell</button>
                     </div>
                 </li>
             `);
-            $(`#page_mywagons .scroll-container .collapsible #${wagonId}`).hover(function() {  
-                $(this).click(function() {
-                    $.post('http://oss_wagons/LoadMyWagon', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel}));
-                });                         
-            }, function() {});
         };
     };
 });
@@ -100,8 +95,9 @@ function BuyWagon(modelW, price, isCash) {
     };
 };
 
-function Select(wagonId) {
+function Select(wagonId, wagonModel) {
     $.post('http://oss_wagons/SelectWagon', JSON.stringify({WagonId: wagonId}));
+    $.post('http://oss_wagons/LoadMyWagon', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel }));
 };
 
 function Rename(wagonId) {    
@@ -112,15 +108,15 @@ function Rename(wagonId) {
 };
 
 function Spawn(wagonId, wagonModel, wagonName) {    
-    $.post('http://oss_wagons/SetWagonInfo', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel, WagonName: wagonName }));
+    $.post('http://oss_wagons/SetMyWagonInfo', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel, WagonName: wagonName }));
     $('#page_mywagons .scroll-container .collapsible').html('');
     $('#page_shop .scroll-container .collapsible').html('');
     $("#creatormenu").fadeOut(1000);
     CloseMenu()
 };
 
-function Sell(wagonId, wagonName) {    
-    $.post('http://oss_wagons/SellWagon', JSON.stringify({ WagonId: wagonId,  WagonName: wagonName}));
+function Sell(wagonId, wagonName, wagonName) {    
+    $.post('http://oss_wagons/SellWagon', JSON.stringify({ WagonId: wagonId,  WagonName: wagonName, WagonName: wagonName}));
     $('#page_mywagons .scroll-container .collapsible').html('');
     $('#page_shop .scroll-container .collapsible').html('');
     $("#creatormenu").fadeOut(1000);

@@ -46,8 +46,8 @@ AddEventHandler('oss_wagons:BuyWagon', function(data)
                 return
             end
         end
-        local action = "newWagon"
-        TriggerClientEvent('oss_wagons:SetWagonName', _source, data, action)
+        local rename = false
+        TriggerClientEvent('oss_wagons:SetWagonName', _source, data, rename)
     end)
 end)
 
@@ -87,15 +87,12 @@ AddEventHandler('oss_wagons:SelectWagon', function(id)
             local wagonId = wagon[i].id
             MySQL.Async.execute('UPDATE player_wagons SET selected = ? WHERE identifier = ? AND charid = ? AND id = ?', {0, identifier, charid, wagonId},
             function(done)
+                if wagon[i].id == id then
+                    MySQL.Async.execute('UPDATE player_wagons SET selected = ? WHERE identifier = ? AND charid = ? AND id = ?', {1, identifier, charid, id},
+                    function(done)
+                    end)
+                end
             end)
-
-            Wait(300)
-
-            if wagon[i].id == id then
-                MySQL.Async.execute('UPDATE player_wagons SET selected = ? WHERE identifier = ? AND charid = ? AND id = ?', {1, identifier, charid, id},
-                function(done)
-                end)
-            end
         end
     end)
 end)
@@ -107,15 +104,13 @@ AddEventHandler('oss_wagons:GetSelectedWagon', function()
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
-    print("GetSelectedWagon")
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', {identifier, charid},
     function(wagons)
         if #wagons ~= 0 then
             for i = 1, #wagons do
                 if wagons[i].selected == 1 then
                     local menuSpawn = false
-                    TriggerClientEvent('oss_wagons:SetWagonInfo', _source, wagons[i].model, wagons[i].name, menuSpawn, wagons[i].id)
-                    print("SetWagonInfo")
+                    TriggerClientEvent('oss_wagons:SpawnWagon', _source, wagons[i].model, wagons[i].name, menuSpawn, wagons[i].id)
                 end
             end
         else

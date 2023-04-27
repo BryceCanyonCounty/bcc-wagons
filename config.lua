@@ -10,7 +10,7 @@ Config.shopKey = 0x760A9C6F --[G]
 Config.returnKey = 0xD9D0E1C0 --[spacebar]
 
 -- Limit Number of Wagons per Player
-Config.maxWagons = 8 -- Default: 8
+Config.maxWagons = 5 -- Default: 5
 
 -- Number of Items Allowed in Wagon Inventory
 Config.invLimit = 200 -- Default: 200

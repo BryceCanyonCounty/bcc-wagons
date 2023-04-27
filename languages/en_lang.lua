@@ -18,5 +18,6 @@ Locales["en_lang"] = {
     soldWagon = "You sold ~o~",
     frcash = "~q~ for ~t6~$",
     nameWagon = "Name your wagon:",
-    wagonInv = "Storage Chest"
+    wagonInv = "Storage Chest",
+    tooClose = "You're too close to call your wagon"
 }

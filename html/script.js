@@ -68,8 +68,8 @@ window.addEventListener('message', function(event) {
             const wagonModel = tab.model;
             $('#page_mywagons .scroll-container .collapsible').append(`
                 <li>
-                    <div class="collapsible-header col s12 panel">
-                        <div class="col s12 panel-title" onclick="Select(${wagonId}, '${wagonModel}')">
+                    <div id="${wagonId}" class="collapsible-header col s12 panel">
+                        <div class="col s12 panel-title" onclick="Select(${wagonId})">
                             <h6 class="grey-text plus" >${wagonName}</h6>
                         </div>
                     </div>
@@ -80,14 +80,16 @@ window.addEventListener('message', function(event) {
                     </div>
                 </li>
             `);
+            $(`#page_mywagons .scroll-container .collapsible #${wagonId}`).hover(function() {  
+                $(this).click(function() {
+                    $.post('http://oss_wagons/LoadMyWagon', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel}));
+                });                         
+            }, function() {});
         };
     };
 });
 
 function BuyWagon(modelW, price, isCash) {
-    $('#page_mywagons .scroll-container .collapsible').html('');
-    $('#page_shop .scroll-container .collapsible').html('');
-    $("#creatormenu").fadeOut(1000);
     if (isCash) {        
         $.post('http://oss_wagons/BuyWagon', JSON.stringify({ ModelW: modelW, Cash: price, IsCash: isCash }));
     } else {
@@ -95,31 +97,20 @@ function BuyWagon(modelW, price, isCash) {
     };
 };
 
-function Select(wagonId, wagonModel) {
+function Select(wagonId) {
     $.post('http://oss_wagons/SelectWagon', JSON.stringify({WagonId: wagonId}));
-    $.post('http://oss_wagons/LoadMyWagon', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel }));
 };
 
 function Rename(wagonId) {    
     $.post('http://oss_wagons/RenameWagon', JSON.stringify({ WagonId: wagonId}));
-    $('#page_mywagons .scroll-container .collapsible').html('');
-    $('#page_shop .scroll-container .collapsible').html('');
-    $("#creatormenu").fadeOut(1000);
 };
 
 function Spawn(wagonId, wagonModel, wagonName) {    
     $.post('http://oss_wagons/SpawnInfo', JSON.stringify({ WagonId: wagonId, WagonModel: wagonModel, WagonName: wagonName }));
-    $('#page_mywagons .scroll-container .collapsible').html('');
-    $('#page_shop .scroll-container .collapsible').html('');
-    $("#creatormenu").fadeOut(1000);
-    CloseMenu()
 };
 
 function Sell(wagonId, wagonName, wagonName) {    
     $.post('http://oss_wagons/SellWagon', JSON.stringify({ WagonId: wagonId,  WagonName: wagonName, WagonName: wagonName}));
-    $('#page_mywagons .scroll-container .collapsible').html('');
-    $('#page_shop .scroll-container .collapsible').html('');
-    $("#creatormenu").fadeOut(1000);
 };
 
 function Rotate(direction) {
@@ -129,9 +120,6 @@ function Rotate(direction) {
 
 function CloseMenu() {
     $.post('http://oss_wagons/CloseMenu');
-    $('#page_mywagons .scroll-container .collapsible').html('');
-    $('#page_shop .scroll-container .collapsible').html('');
-    $("#creatormenu").fadeOut(1000);
     ResetMenu();
 };
 

@@ -11,9 +11,14 @@ This is a wagons script for RedM servers using the [VORP framework](https://gith
 - Shop blips are colored and changeable per shop location
 - Blips can change color reflecting if shop is open, closed or job locked
 - Shop access can be limited by job and jobgrade
-- Wagons can be returned at any shop location via prompt or remotely using the command `/returnWagon`
+- Wagons can be returned at any shop location via prompt
 - Give your wagon a special name at purchase time (rename wagon using the menu)
 - Set a max number of wagons per player in the config
+- More to come!
+
+#### Commands
+- Command `/wagonRespawn` to bypass distance check and respawn wagon
+- Command `/wagonReturn` to return wagon when away from a shop
 
 #### Configuration
 Settings can be changed in the `config.lua` file. Here is an example of one shop:

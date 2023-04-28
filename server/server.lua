@@ -136,8 +136,8 @@ AddEventHandler('oss_wagons:GetMyWagons', function()
     local charid = Character.charIdentifier
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', {identifier, charid},
-    function(wagons)
-        TriggerClientEvent('oss_wagons:ReceiveWagonsData', _source, wagons)
+    function(myWagons)
+        TriggerClientEvent('oss_wagons:WagonsData', _source, myWagons)
     end)
 end)
 

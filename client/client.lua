@@ -245,7 +245,7 @@ Citizen.CreateThread(function()
     end
 end)
 
--- Open Main Menu
+-- Open Wagon Shop Menu
 function OpenMenu(shopId)
     InMenu = true
     ShopId = shopId
@@ -262,22 +262,22 @@ function OpenMenu(shopId)
 end
 
 -- Get Wagon Data for Players Wagons
-RegisterNetEvent('oss_wagons:ReceiveWagonsData')
-AddEventHandler('oss_wagons:ReceiveWagonsData', function(dataWagons)
+RegisterNetEvent('oss_wagons:WagonsData')
+AddEventHandler('oss_wagons:WagonsData', function(data)
 
     SendNUIMessage({
         action = "show",
-        shopData = GetShopData(),
+        shopWagons = GetShopWagons(),
         location = ShopName,
-        myWagonsData = dataWagons
+        myWagons = data
     })
     SetNuiFocus(true, true)
 end)
 
 -- Get Wagon Data for Purchases
-function GetShopData()
-    local shopWagons = Config.wagonShops[ShopId].wagons
-    return shopWagons
+function GetShopWagons()
+    local shopWagonData = Config.wagonShops[ShopId].wagons
+    return shopWagonData
 end
 
 -- View Wagons for Purchase
@@ -288,11 +288,7 @@ RegisterNUICallback("LoadWagon", function(data)
     end
 
     local model = joaat(data.WagonModel)
-    RequestModel(model)
-    while not HasModelLoaded(model) do
-        RequestModel(model)
-        Citizen.Wait(100)
-    end
+    LoadWagonModel(model)
 
     if Showroom_entity ~= nil then
         DeleteEntity(Showroom_entity)
@@ -306,12 +302,13 @@ RegisterNUICallback("LoadWagon", function(data)
     SetModelAsNoLongerNeeded(model)
 end)
 
--- Buy and Name New Wagons
+-- Buy New Wagons
 RegisterNUICallback("BuyWagon", function(data)
 
     TriggerServerEvent('oss_wagons:BuyWagon', data)
 end)
 
+-- Name Wagons
 RegisterNetEvent('oss_wagons:SetWagonName')
 AddEventHandler('oss_wagons:SetWagonName', function(data, rename)
     HideMenu()
@@ -355,11 +352,7 @@ RegisterNUICallback("LoadMyWagon", function(data)
     end
 
     local model = joaat(data.WagonModel)
-    RequestModel(model)
-    while not HasModelLoaded(model) do
-        RequestModel(model)
-        Citizen.Wait(100)
-    end
+    LoadWagonModel(model)
 
     if MyWagon_entity ~= nil then
         DeleteEntity(MyWagon_entity)
@@ -394,11 +387,7 @@ AddEventHandler('oss_wagons:SpawnWagon', function(wagonModel, name, menuSpawn, i
     end
 
     local model = joaat(wagonModel)
-    RequestModel(model)
-    while not HasModelLoaded(model) do
-        RequestModel(model)
-        Citizen.Wait(100)
-    end
+    LoadWagonModel(model)
 
     if menuSpawn then
         local shopConfig = Config.wagonShops[ShopId]
@@ -478,6 +467,13 @@ function HideMenu()
     SetNuiFocus(false, false)
 end
 
+function LoadWagonModel(model)
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Citizen.Wait(100)
+    end
+end
 -- Reopen Menu After Sell or Failed Purchase
 RegisterNetEvent('oss_wagons:WagonMenu')
 AddEventHandler('oss_wagons:WagonMenu', function()

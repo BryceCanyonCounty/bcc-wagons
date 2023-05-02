@@ -34,7 +34,7 @@ Config.wagonShops = {
         wagonCam = {x = -391.07, y = 794.49, z = 115.94}, -- Camera Location to View Wagon When In-Menu
         distanceShop = 2.0, -- Distance from NPC to Get Menu Prompt
         npcAllowed = true, -- Turns NPCs On / Off
-        npcModel = "A_M_M_UniBoatCrew_01", -- Sets Model for NPCs
+        npcModel = "s_m_m_coachtaxidriver_01", -- Sets Model for NPCs
         allowedJobs = {}, -- Empty, Everyone Can Use / Insert Job to limit access - ex. "police"
         jobGrade = 0, -- Enter Minimum Rank / Job Grade to Access Shop
         shopHours = false, -- If You Want the Shops to Use Open and Closed Hours
@@ -93,7 +93,7 @@ Config.wagonShops = {
         wagonCam = {x = -1830.89, y = -604.33, z = 154.36},
         distanceShop = 2.0,
         npcAllowed = true,
-        npcModel = "A_M_M_UniBoatCrew_01",
+        npcModel = "s_m_m_coachtaxidriver_01",
         allowedJobs = {},
         jobGrade = 0,
         shopHours = false,
@@ -152,7 +152,7 @@ Config.wagonShops = {
         wagonCam = {x = 2989.72, y = 785.28, z = 50.13},
         distanceShop = 2.0,
         npcAllowed = true,
-        npcModel = "A_M_M_UniBoatCrew_01",
+        npcModel = "s_m_m_coachtaxidriver_01",
         allowedJobs = {},
         jobGrade = 0,
         shopHours = false,
@@ -211,7 +211,7 @@ Config.wagonShops = {
         wagonCam = {x = 1227.33, y = -204.34, z = 100.89},
         distanceShop = 2.0,
         npcAllowed = true,
-        npcModel = "A_M_M_UniBoatCrew_01",
+        npcModel = "s_m_m_coachtaxidriver_01",
         allowedJobs = {},
         jobGrade = 0,
         shopHours = false,
@@ -270,7 +270,7 @@ Config.wagonShops = {
         wagonCam = {x = 2653.01, y = -1032.47, z = 45.08},
         distanceShop = 2.0,
         npcAllowed = true,
-        npcModel = "A_M_M_UniBoatCrew_01",
+        npcModel = "s_m_m_coachtaxidriver_01",
         allowedJobs = {},
         jobGrade = 0,
         shopHours = false,
@@ -329,7 +329,7 @@ Config.wagonShops = {
         wagonCam = {x = -879.41, y = -1376.95, z = 43.58},
         distanceShop = 2.0,
         npcAllowed = true,
-        npcModel = "A_M_M_UniBoatCrew_01",
+        npcModel = "s_m_m_coachtaxidriver_01",
         allowedJobs = {},
         jobGrade = 0,
         shopHours = false,
@@ -388,7 +388,7 @@ Config.wagonShops = {
         wagonCam = {x = -5541.83, y = -3017.31, z = -1.23},
         distanceShop = 2.0,
         npcAllowed = true,
-        npcModel = "A_M_M_UniBoatCrew_01",
+        npcModel = "s_m_m_coachtaxidriver_01",
         allowedJobs = {},
         jobGrade = 0,
         shopHours = false,

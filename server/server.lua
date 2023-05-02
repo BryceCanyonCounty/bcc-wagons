@@ -58,10 +58,9 @@ AddEventHandler('oss_wagons:SaveNewWagon', function(data, name)
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
-    local wagonName = tostring(name)
     local wagonModel = data.ModelW
 
-    MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', {identifier, charid, wagonName, wagonModel},
+    MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', {identifier, charid, name, wagonModel},
     function(done)
         TriggerClientEvent('oss_wagons:WagonMenu', _source)
     end)

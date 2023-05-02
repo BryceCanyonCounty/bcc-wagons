@@ -267,21 +267,15 @@ AddEventHandler('oss_wagons:WagonsData', function(data)
 
     SendNUIMessage({
         action = "show",
-        shopWagons = GetShopWagons(),
+        shopWagons = Config.wagonShops[ShopId].wagons,
         location = ShopName,
         myWagons = data
     })
     SetNuiFocus(true, true)
 end)
 
--- Get Wagon Data for Purchases
-function GetShopWagons()
-    local shopWagonData = Config.wagonShops[ShopId].wagons
-    return shopWagonData
-end
-
 -- View Wagons for Purchase
-RegisterNUICallback("LoadWagon", function(data)
+RegisterNUICallback("LoadWagon", function(data, cb)
     if MyWagon_entity ~= nil then
         DeleteEntity(MyWagon_entity)
         MyWagon_entity = nil
@@ -300,12 +294,14 @@ RegisterNUICallback("LoadWagon", function(data)
     Citizen.InvokeNative(0x7263332501E07F52, Showroom_entity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, Showroom_entity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
+    cb('ok')
 end)
 
 -- Buy New Wagons
-RegisterNUICallback("BuyWagon", function(data)
+RegisterNUICallback("BuyWagon", function(data, cb)
 
     TriggerServerEvent('oss_wagons:BuyWagon', data)
+    cb('ok')
 end)
 
 -- Name Wagons
@@ -334,18 +330,20 @@ AddEventHandler('oss_wagons:SetWagonName', function(data, rename)
 end)
 
 -- Rename Owned Wagon
-RegisterNUICallback("RenameWagon", function(data)
+RegisterNUICallback("RenameWagon", function(data, cb)
     local rename = true
     TriggerEvent('oss_wagons:SetWagonName', data, rename)
+    cb('ok')
 end)
 
 -- Select Active Wagon
-RegisterNUICallback("SelectWagon", function(data)
+RegisterNUICallback("SelectWagon", function(data, cb)
     TriggerServerEvent('oss_wagons:SelectWagon', tonumber(data.WagonId))
+    cb('ok')
 end)
 
 -- View Player Owned Wagons
-RegisterNUICallback("LoadMyWagon", function(data)
+RegisterNUICallback("LoadMyWagon", function(data, cb)
     if Showroom_entity ~= nil then
         DeleteEntity(Showroom_entity)
         Showroom_entity = nil
@@ -364,16 +362,18 @@ RegisterNUICallback("LoadMyWagon", function(data)
     Citizen.InvokeNative(0x7263332501E07F52, MyWagon_entity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyWagon_entity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
+    cb('ok')
 end)
 
 -- Spawn Player Owned Wagons
-RegisterNUICallback("SpawnInfo", function(data)
+RegisterNUICallback("SpawnInfo", function(data, cb)
     local wagonModel = data.WagonModel
     local wagonName = data.WagonName
     local menuSpawn = true
     local wagonId = data.WagonId
     CloseMenu()
     TriggerEvent('oss_wagons:SpawnWagon', wagonModel, wagonName, menuSpawn, wagonId)
+    cb('ok')
 end)
 
 RegisterNetEvent('oss_wagons:SpawnWagon')
@@ -394,6 +394,13 @@ AddEventHandler('oss_wagons:SpawnWagon', function(wagonModel, name, menuSpawn, i
         MyWagon = CreateVehicle(model, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z, shopConfig.spawn.h, true, false)
         SetVehicleOnGroundProperly(MyWagon)
         SetModelAsNoLongerNeeded(model)
+        if wagonModel == "huntercart01" then
+            Citizen.InvokeNative(0x6A4404BDFA62CE2C, player, MyWagon) -- SetPlayerHuntingWagon
+            --SetIgnoreVehicleOwnershipForStowing(true)
+            Citizen.InvokeNative(0x75F90E4051CC084C, MyWagon, joaat("pg_mp005_huntingWagonTarp01")) -- AddAdditionalPropSetForVehicle
+            Citizen.InvokeNative(0x31F343383F19C987, MyWagon, 0.5, 1) -- SetBatchTarpHeight
+            Citizen.InvokeNative(0xF89D82A0582E46ED, MyWagon, 0) -- SetVehicleLivery (0 - 5)
+        end
         DoScreenFadeOut(500)
         Wait(500)
         SetPedIntoVehicle(player, MyWagon, -1)
@@ -420,7 +427,6 @@ AddEventHandler('oss_wagons:SpawnWagon', function(wagonModel, name, menuSpawn, i
         MyWagon = CreateVehicle(model, spawnPosition, GetEntityHeading(player), true, false)
         SetVehicleOnGroundProperly(MyWagon)
         SetModelAsNoLongerNeeded(model)
-
     end
     TriggerServerEvent('oss_wagons:RegisterInventory', MyWagonId)
 
@@ -430,17 +436,19 @@ AddEventHandler('oss_wagons:SpawnWagon', function(wagonModel, name, menuSpawn, i
 end)
 
 -- Sell Player Owned Wagons
-RegisterNUICallback("SellWagon", function(data)
+RegisterNUICallback("SellWagon", function(data, cb)
     local wagonId = data.WagonId
     local wagonName = data.WagonName
     DeleteEntity(MyWagon_entity)
     HideMenu()
     TriggerServerEvent('oss_wagons:SellWagon', wagonId, wagonName, ShopId)
+    cb('ok')
 end)
 
 -- Close Wagon Shop Menu
-RegisterNUICallback("CloseMenu", function()
+RegisterNUICallback("CloseMenu", function(data,cb)
    CloseMenu()
+   cb('ok')
 end)
 
 function CloseMenu()
@@ -474,6 +482,7 @@ function LoadWagonModel(model)
         Citizen.Wait(100)
     end
 end
+
 -- Reopen Menu After Sell or Failed Purchase
 RegisterNetEvent('oss_wagons:WagonMenu')
 AddEventHandler('oss_wagons:WagonMenu', function()
@@ -552,13 +561,14 @@ function CreateCamera()
 end
 
 -- Rotate Wagons while Viewing
-RegisterNUICallback("Rotate", function(data)
+RegisterNUICallback("Rotate", function(data, cb)
     local direction = data.RotateWagon
     if direction == "left" then
         Rotation(20)
     elseif direction == "right" then
         Rotation(-20)
     end
+    cb('ok')
 end)
 
 function Rotation(dir)
@@ -692,6 +702,8 @@ AddEventHandler('onResourceStop', function(resourceName)
     PromptDelete(OpenShops)
     PromptDelete(CloseShops)
     PromptDelete(OpenReturn)
+    DestroyAllCams(true)
+    DisplayRadar(true)
 
     if MyWagon ~= nil then
         DeleteEntity(MyWagon)

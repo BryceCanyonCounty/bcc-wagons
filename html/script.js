@@ -76,7 +76,7 @@ window.addEventListener('message', function(event) {
                     <div class="collapsible-body col s12 panel-mywagon item">
                         <button class="col s4 panel-col item-mywagon" onclick="Rename(${wagonId})">Rename</button>
                         <button class="col s4 panel-col item-mywagon" onclick="Spawn(${wagonId}, '${wagonModel}', '${wagonName}')">Spawn</button>
-                        <button class="col s4 panel-col item-mywagon" onclick="Sell(${wagonId}, '${wagonModel}', '${wagonName}')">Sell</button>
+                        <button class="col s4 panel-col item-mywagon" onclick="Sell(${wagonId}, '${wagonName}')">Sell</button>
                     </div>
                 </li>
             `);

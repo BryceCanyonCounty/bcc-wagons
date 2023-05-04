@@ -58,23 +58,19 @@ AddEventHandler('oss_wagons:SaveNewWagon', function(data, name)
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
-    local wagonModel = data.ModelW
 
-    MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', {identifier, charid, name, wagonModel},
-    function(done)
-        TriggerClientEvent('oss_wagons:WagonMenu', _source)
+    MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', {identifier, charid, tostring(name), data.ModelW},
+        function(done)
     end)
 end)
 
 -- Rename Owned Wagons
 RegisterServerEvent('oss_wagons:UpdateWagonName')
 AddEventHandler('oss_wagons:UpdateWagonName', function(data, name)
-    local _source = source
     local wagonId = data.WagonId
 
     MySQL.Async.execute('UPDATE player_wagons SET name = ? WHERE id = ?', {name, wagonId},
     function(done)
-        TriggerClientEvent('oss_wagons:WagonMenu', _source)
     end)
 end)
 
@@ -113,11 +109,8 @@ AddEventHandler('oss_wagons:GetSelectedWagon', function()
         if #wagons ~= 0 then
             for i = 1, #wagons do
                 if wagons[i].selected == 1 then
-                    local wagonModel =  wagons[i].model
-                    local wagonName = wagons[i].name
                     local menuSpawn = false
-                    local wagonId = wagons[i].id
-                    TriggerClientEvent('oss_wagons:SpawnWagon', _source, wagonModel, wagonName, menuSpawn, wagonId)
+                    TriggerClientEvent('oss_wagons:SpawnWagon', _source, wagons[i].model, wagons[i].name, menuSpawn, wagons[i].id)
                 end
             end
         else
@@ -135,8 +128,8 @@ AddEventHandler('oss_wagons:GetMyWagons', function()
     local charid = Character.charIdentifier
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', {identifier, charid},
-    function(myWagons)
-        TriggerClientEvent('oss_wagons:WagonsData', _source, myWagons)
+    function(wagons)
+        TriggerClientEvent('oss_wagons:ReceiveWagonsData', _source, wagons)
     end)
 end)
 
@@ -156,18 +149,19 @@ AddEventHandler('oss_wagons:SellWagon', function(wagonId, wagonName, shopId)
                 modelWagon = wagons[i].model
                 MySQL.Async.execute('DELETE FROM player_wagons WHERE identifier = ? AND charid = ? AND id = ?', {identifier, charid, wagonId},
                 function(done)
-                    for _,wagonModels in pairs(Config.wagonShops[shopId].wagons) do
-                        for model,wagonConfig in pairs(wagonModels) do
-                            if model ~= "wagonType" then
-                                if model == modelWagon then
-                                    local sellPrice = wagonConfig.sellPrice
-                                    Character.addCurrency(0, sellPrice)
-                                    VORPcore.NotifyRightTip(_source, _U("soldWagon") .. wagonName .. _U("frcash") .. sellPrice, 5000)
-                                end
-                            end
-                        end
-                    end
                 end)
+            end
+        end
+
+        for _,wagonModels in pairs(Config.wagonShops[shopId].wagons) do
+            for model,wagonConfig in pairs(wagonModels) do
+                if model ~= "wagonType" then
+                    if model == modelWagon then
+                        local sellPrice = wagonConfig.sellPrice
+                        Character.addCurrency(0, sellPrice)
+                        VORPcore.NotifyRightTip(_source, _U("soldWagon") .. wagonName .. _U("frcash") .. sellPrice, 5000)
+                    end
+                end
             end
         end
         TriggerClientEvent('oss_wagons:WagonMenu', _source)

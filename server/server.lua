@@ -59,7 +59,7 @@ AddEventHandler('oss_wagons:SaveNewWagon', function(data, name)
     local identifier = Character.identifier
     local charid = Character.charIdentifier
 
-    MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', {identifier, charid, tostring(name), data.ModelW},
+    MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', {identifier, charid, name, data.ModelW},
         function(done)
     end)
 end)
@@ -67,25 +67,24 @@ end)
 -- Rename Owned Wagons
 RegisterServerEvent('oss_wagons:UpdateWagonName')
 AddEventHandler('oss_wagons:UpdateWagonName', function(data, name)
-    local wagonId = data.WagonId
 
-    MySQL.Async.execute('UPDATE player_wagons SET name = ? WHERE id = ?', {name, wagonId},
+    MySQL.Async.execute('UPDATE player_wagons SET name = ? WHERE id = ?', {name, data.WagonId},
     function(done)
     end)
 end)
 
 RegisterServerEvent('oss_wagons:SelectWagon')
-AddEventHandler('oss_wagons:SelectWagon', function(id)
+AddEventHandler('oss_wagons:SelectWagon', function(data)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
+    local id = tonumber(data.WagonId)
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', {identifier, charid},
     function(wagon)
         for i = 1, #wagon do
-            local wagonId = wagon[i].id
-            MySQL.Async.execute('UPDATE player_wagons SET selected = ? WHERE identifier = ? AND charid = ? AND id = ?', {0, identifier, charid, wagonId},
+            MySQL.Async.execute('UPDATE player_wagons SET selected = ? WHERE identifier = ? AND charid = ? AND id = ?', {0, identifier, charid, wagon[i].id},
             function(done)
                 if wagon[i].id == id then
                     MySQL.Async.execute('UPDATE player_wagons SET selected = ? WHERE identifier = ? AND charid = ? AND id = ?', {1, identifier, charid, id},
@@ -129,39 +128,39 @@ AddEventHandler('oss_wagons:GetMyWagons', function()
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', {identifier, charid},
     function(wagons)
-        TriggerClientEvent('oss_wagons:ReceiveWagonsData', _source, wagons)
+        TriggerClientEvent('oss_wagons:WagonsData', _source, wagons)
     end)
 end)
 
 -- Sell Player Owned Wagons
 RegisterServerEvent('oss_wagons:SellWagon')
-AddEventHandler('oss_wagons:SellWagon', function(wagonId, wagonName, shopId)
+AddEventHandler('oss_wagons:SellWagon', function(data, shopId)
     local _source = source
     local Character = VORPcore.getUser(_source).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
     local modelWagon = nil
+    local wagonId = tonumber(data.WagonId)
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', {identifier, charid},
     function(wagons)
         for i = 1, #wagons do
-            if tonumber(wagons[i].id) == tonumber(wagonId) then
+            if tonumber(wagons[i].id) == wagonId then
                 modelWagon = wagons[i].model
                 MySQL.Async.execute('DELETE FROM player_wagons WHERE identifier = ? AND charid = ? AND id = ?', {identifier, charid, wagonId},
                 function(done)
-                end)
-            end
-        end
-
-        for _,wagonModels in pairs(Config.wagonShops[shopId].wagons) do
-            for model,wagonConfig in pairs(wagonModels) do
-                if model ~= "wagonType" then
-                    if model == modelWagon then
-                        local sellPrice = wagonConfig.sellPrice
-                        Character.addCurrency(0, sellPrice)
-                        VORPcore.NotifyRightTip(_source, _U("soldWagon") .. wagonName .. _U("frcash") .. sellPrice, 5000)
+                    for _,wagonModels in pairs(Config.wagonShops[shopId].wagons) do
+                        for model,wagonConfig in pairs(wagonModels) do
+                            if model ~= "wagonType" then
+                                if model == modelWagon then
+                                    local sellPrice = wagonConfig.sellPrice
+                                    Character.addCurrency(0, sellPrice)
+                                    VORPcore.NotifyRightTip(_source, _U("soldWagon") .. data.WagonName .. _U("frcash") .. sellPrice, 5000)
+                                end
+                            end
+                        end
                     end
-                end
+                end)
             end
         end
         TriggerClientEvent('oss_wagons:WagonMenu', _source)
@@ -170,16 +169,22 @@ end)
 
 -- Register Wagon Inventory
 RegisterServerEvent('oss_wagons:RegisterInventory')
-AddEventHandler('oss_wagons:RegisterInventory', function(id)
-
-    VORPInv.registerInventory("wagon_" .. tostring(id), _U("wagonInv"), tonumber(Config.invLimit))
+AddEventHandler('oss_wagons:RegisterInventory', function(id, wagonModel, shopId)
+    for _,wagonModels in pairs(Config.wagonShops[shopId].wagons) do
+        for model,wagonConfig in pairs(wagonModels) do
+            if model ~= "wagonType" then
+                if model == wagonModel then
+                    VORPInv.registerInventory("wagon_" .. tostring(id), _U("wagonInv"), tonumber(wagonConfig.invLimit))
+                end
+            end
+        end
+    end
 end)
 
 -- Open Wagon Inventory
 RegisterServerEvent('oss_wagons:OpenInventory')
 AddEventHandler('oss_wagons:OpenInventory', function(id)
     local _source = source
-
     VORPInv.OpenInv(_source, "wagon_" .. tostring(id))
 end)
 
@@ -187,10 +192,8 @@ end)
 RegisterServerEvent('oss_wagons:getPlayerJob')
 AddEventHandler('oss_wagons:getPlayerJob', function()
     local _source = source
-    if _source then
-        local Character = VORPcore.getUser(_source).getUsedCharacter
-        local CharacterJob = Character.job
-        local CharacterGrade = Character.jobGrade
-        TriggerClientEvent('oss_wagons:sendPlayerJob', _source, CharacterJob, CharacterGrade)
-    end
+    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local CharacterJob = Character.job
+    local CharacterGrade = Character.jobGrade
+    TriggerClientEvent('oss_wagons:sendPlayerJob', _source, CharacterJob, CharacterGrade)
 end)

@@ -19,6 +19,7 @@ local MyWagonName
 local WagonCam
 local ShopId
 local InMenu = false
+local Cam = false
 
 TriggerEvent("getCore", function(core)
     VORPcore = core
@@ -262,6 +263,13 @@ function OpenMenu(shopId)
 
     CreateCamera()
 
+    SendNUIMessage({
+        action = "show",
+        shopData = Config.wagonShops[ShopId].wagons,
+        location = ShopName
+    })
+    SetNuiFocus(true, true)
+
     TriggerServerEvent('oss_wagons:GetMyWagons')
 end
 
@@ -270,12 +278,8 @@ RegisterNetEvent('oss_wagons:WagonsData')
 AddEventHandler('oss_wagons:WagonsData', function(wagonsData)
 
     SendNUIMessage({
-        action = "show",
-        shopData = Config.wagonShops[ShopId].wagons,
-        location = ShopName,
         myWagonsData = wagonsData
     })
-    SetNuiFocus(true, true)
 end)
 
 -- View Wagons for Purchase
@@ -299,6 +303,10 @@ RegisterNUICallback("LoadWagon", function(data, cb)
     Citizen.InvokeNative(0x7263332501E07F52, ShopEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, ShopEntity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
+    if not Cam then
+        Cam = true
+        CameraLighting()
+    end
 end)
 
 -- Buy and Name New Wagons
@@ -376,6 +384,10 @@ RegisterNUICallback("LoadMyWagon", function(data, cb)
     Citizen.InvokeNative(0x7263332501E07F52, MyEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyEntity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
+    if not Cam then
+        Cam = true
+        CameraLighting()
+    end
 end)
 
 -- Spawn Player Owned Wagons
@@ -461,6 +473,7 @@ RegisterNUICallback("CloseMenu", function(data, cb)
     end
     MyEntity = nil
 
+    Cam = false
     DestroyAllCams(true)
     DisplayRadar(true)
     InMenu = false
@@ -557,6 +570,16 @@ function CreateCamera()
     Wait(500)
     DoScreenFadeIn(500)
     RenderScriptCams(true, false, 0, 0, 0)
+end
+
+function CameraLighting()
+    CreateThread(function()
+        local shopConfig = Config.wagonShops[ShopId]
+        while Cam do
+            Wait(0)
+            Citizen.InvokeNative(0xD2D9E04C0DF927F4, shopConfig.spawn.x, shopConfig.spawn.y, shopConfig.spawn.z + 3, 130, 130, 85, 4.0, 15.0) -- DrawLightWithRange
+        end
+    end)
 end
 
 -- Rotate Wagons while Viewing

@@ -21,12 +21,14 @@ shared_scripts {
 }
 
 ui_page {
-	'html/index.html'
+    "ui/dist/index.html"
 }
 
 files {
-	'html/*',
-	'html/css/*',
-	'html/fonts/*',
-	'html/img/*'
+    "ui/dist/index.html",
+    "ui/dist/js/*.*",
+    "ui/dist/css/*.*",
+    "ui/dist/fonts/*.*",
+    "ui/dist/img/*.*",
+    "ui/dist/style.css"
 }

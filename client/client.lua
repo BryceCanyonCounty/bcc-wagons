@@ -352,7 +352,8 @@ RegisterNetEvent('bcc-wagons:SetWagonName', function(data, rename)
             SendNUIMessage({
                 action = "show",
                 shopData = Config.wagonShops[ShopId].wagons,
-                location = ShopName
+                location = ShopName,
+                currencyType = Config.currencyType
             })
             SetNuiFocus(true, true)
             Wait(1000)
@@ -502,7 +503,8 @@ RegisterNetEvent('bcc-wagons:WagonMenu', function()
     SendNUIMessage({
         action = "show",
         shopData = Config.wagonShops[ShopId].wagons,
-        location = ShopName
+        location = ShopName,
+        currencyType = Config.currencyType
     })
     TriggerServerEvent('bcc-wagons:GetMyWagons')
 end)

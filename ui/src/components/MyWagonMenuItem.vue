@@ -116,6 +116,7 @@ export default {
         .catch((e) => {
           console.log(e.message);
         });
+      this.showModal = false;
     },
     SpawnWagon() {
       api

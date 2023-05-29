@@ -93,6 +93,7 @@ export default {
       });
     },
     buyWagon() {
+      this.isVisible = false;
       if (this.currType !== null) {
         api.post("BuyWagon", {
           ModelW: this.model,

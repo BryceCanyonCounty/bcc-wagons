@@ -63,7 +63,6 @@ export default {
     return {
       isVisible: false,
       currType: null,
-      gender: "male",
     };
   },
   computed: {
@@ -93,6 +92,7 @@ export default {
       });
     },
     buyWagon() {
+      this.isVisible = false;
       if (this.currType !== null) {
         api.post("BuyWagon", {
           ModelW: this.model,
@@ -101,6 +101,10 @@ export default {
           IsCash: this.currType,
         });
       }
+    },
+    hideModal() {
+      this.isVisible = false;
+      this.currType = null;
     },
   },
   components: {

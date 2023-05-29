@@ -168,11 +168,9 @@ end)
 -- Register Wagon Inventory
 RegisterNetEvent('bcc-wagons:RegisterInventory', function(id, wagonModel, shopId)
     for _, wagonModels in pairs(Config.wagonShops[shopId].wagons) do
-        for model, wagonConfig in pairs(wagonModels) do
-            if model ~= "wagonType" then
-                if model == wagonModel then
-                    VORPInv.registerInventory("wagon_" .. tostring(id), _U("wagonInv"), tonumber(wagonConfig.invLimit))
-                end
+        for model, wagonConfig in pairs(wagonModels["types"]) do
+            if model == wagonModel then
+                VORPInv.registerInventory("wagon_" .. tostring(id), _U("wagonInv"), tonumber(wagonConfig.invLimit))
             end
         end
     end

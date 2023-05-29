@@ -63,7 +63,6 @@ export default {
     return {
       isVisible: false,
       currType: null,
-      gender: "male",
     };
   },
   computed: {
@@ -102,6 +101,10 @@ export default {
           IsCash: this.currType,
         });
       }
+    },
+    hideModal() {
+      this.isVisible = false;
+      this.currType = null;
     },
   },
   components: {

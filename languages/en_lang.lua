@@ -10,7 +10,7 @@ Locales["en_lang"] = {
     shortGold = "You don't have enough gold",
     shortCash = "You don't have enough money",
     wagonReturned = " has been ~o~returned",
-    noWagon = "You don't have a wagon to return",
+    noWagonReturn = "You don't have a wagon to return",
     noOwnedWagons = "You don't own any wagons",
     needJob = "To use this shop you need job: ~o~",
     wagonLimit = "You can have a maximum of ~o~",
@@ -19,5 +19,6 @@ Locales["en_lang"] = {
     frcash = "~q~ for ~t6~$",
     nameWagon = "Name your wagon:",
     wagonInv = "Storage Chest",
-    tooClose = "You're too close to call your wagon"
+    tooClose = "You're too close to call your wagon",
+    noWagon = "You don't have a wagon out"
 }

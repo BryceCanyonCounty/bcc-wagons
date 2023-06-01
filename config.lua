@@ -12,6 +12,9 @@ Config.returnKey = 0xD9D0E1C0 --[spacebar]
 -- Limit Number of Wagons per Player
 Config.maxWagons = 5 -- Default: 5
 
+-- Can Players Call Their Selected Wagon? (Key: J)
+Config.callAllowed = true -- Default: true / Set to false to Disable
+
 -- Which currancy type is allowed?
 -- 0 = Cash Only
 -- 1 = Gold Only
@@ -21,8 +24,40 @@ Config.currencyType = 2 -- Default: 2
 -- Show or Remove Blip when Closed
 Config.blipAllowedClosed = true -- If true, will show colored blip when shop is closed
 
+-- Inventory Limit per Wagon Model
+Config.inventory = {
+    -- Buggies
+    buggy01 = { invLimit = 50 },
+    buggy02 = { invLimit = 50 },
+    buggy03 = { invLimit = 50 },
+    cart02  = { invLimit = 50 },
+    -- Coaches
+    coach3 = { invLimit = 100 },
+    coach4 = { invLimit = 100 },
+    coach5 = { invLimit = 100 },
+    coach6 = { invLimit = 100 },
+    -- Carts
+    cart01       = { invLimit = 200 },
+    cart03       = { invLimit = 200 },
+    cart04       = { invLimit = 200 },
+    cart06       = { invLimit = 200 },
+    cart07       = { invLimit = 200 },
+    cart08       = { invLimit = 200 },
+    huntercart01 = { invLimit = 200 },
+    -- Wagons
+    supplywagon       = { invLimit = 400 },
+    wagontraveller01x = { invLimit = 400 },
+    wagon03x          = { invLimit = 400 },
+    wagon05x          = { invLimit = 400 },
+    wagon02x          = { invLimit = 400 },
+    wagon04x          = { invLimit = 400 },
+    wagon06x          = { invLimit = 400 },
+    chuckwagon000x    = { invLimit = 400 },
+    chuckwagon002x    = { invLimit = 400 },
+}
+
 -- Wagon Shops
-Config.wagonShops = {
+Config.shops = {
     valentine = {
         shopName = "Valentine Wagons",                               -- Name of Shop on Menu
         promptName = "Valentine Wagons",                             -- Text Below the Prompt Button
@@ -47,45 +82,45 @@ Config.wagonShops = {
             {
                 name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }
@@ -112,47 +147,47 @@ Config.wagonShops = {
         shopClose = 21,
         wagons = {
             {
-                name = "Buggies",
+                name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }
@@ -179,47 +214,47 @@ Config.wagonShops = {
         shopClose = 21,
         wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
             {
-                name = "Buggies",
+                name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }
@@ -246,47 +281,47 @@ Config.wagonShops = {
         shopClose = 21,
         wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
             {
-                name = "Buggies",
+                name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }
@@ -313,47 +348,47 @@ Config.wagonShops = {
         shopClose = 21,
         wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
             {
-                name = "Buggies",
+                name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }
@@ -380,47 +415,47 @@ Config.wagonShops = {
         shopClose = 21,
         wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
             {
-                name = "Buggies",
+                name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }
@@ -447,47 +482,47 @@ Config.wagonShops = {
         shopClose = 21,
         wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
             {
-                name = "Buggies",
+                name  = "Buggies",
                 types = {
-                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7, sellPrice = 90, invLimit = 50 },
-                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120, invLimit = 50 },
-                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150, invLimit = 50 },
-                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5, sellPrice = 60, invLimit = 50 },
+                    ["buggy01"] = { label = "Buggy 1", cashPrice = 150, goldPrice = 7,  sellPrice = 90  },
+                    ["buggy02"] = { label = "Buggy 2", cashPrice = 200, goldPrice = 10, sellPrice = 120 },
+                    ["buggy03"] = { label = "Buggy 3", cashPrice = 250, goldPrice = 12, sellPrice = 150 },
+                    ["cart02"]  = { label = "Buggy 4", cashPrice = 100, goldPrice = 5,  sellPrice = 60  },
                 }
             },
             {
                 name = "Coaches",
                 types = {
-                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 100 },
-                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
-                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210, invLimit = 100 },
-                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180, invLimit = 100 },
+                    ["coach3"] = { label = "Coach 1", cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["coach4"] = { label = "Coach 2", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
+                    ["coach5"] = { label = "Coach 3", cashPrice = 350, goldPrice = 17, sellPrice = 210 },
+                    ["coach6"] = { label = "Coach 4", cashPrice = 300, goldPrice = 14, sellPrice = 180 },
                 }
             },
             {
                 name = "Carts",
                 types = {
-                    ["cart01"]       = { label = "Cart 1", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart03"]       = { label = "Cart 2", cashPrice = 450, goldPrice = 22, sellPrice = 270, invLimit = 200 },
-                    ["cart04"]       = { label = "Cart 3", cashPrice = 550, goldPrice = 26, sellPrice = 330, invLimit = 200 },
-                    ["cart06"]       = { label = "Cart 4", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
-                    ["cart07"]       = { label = "Cart 5", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["cart08"]       = { label = "Cart 6", cashPrice = 400, goldPrice = 19, sellPrice = 240, invLimit = 200 },
-                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390, invLimit = 200 },
+                    ["cart01"]       = { label = "Cart 1",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart03"]       = { label = "Cart 2",      cashPrice = 450, goldPrice = 22, sellPrice = 270 },
+                    ["cart04"]       = { label = "Cart 3",      cashPrice = 550, goldPrice = 26, sellPrice = 330 },
+                    ["cart06"]       = { label = "Cart 4",      cashPrice = 650, goldPrice = 31, sellPrice = 390 },
+                    ["cart07"]       = { label = "Cart 5",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["cart08"]       = { label = "Cart 6",      cashPrice = 400, goldPrice = 19, sellPrice = 240 },
+                    ["huntercart01"] = { label = "Hunter Cart", cashPrice = 650, goldPrice = 31, sellPrice = 390 },
                 }
             },
             {
                 name = "Wagons",
                 types = {
-                    ["supplywagon"]       = { label = "Supply Wagon", cashPrice = 950, goldPrice = 46, sellPrice = 570, invLimit = 400 },
-                    ["wagontraveller01x"] = { label = "Travel Wagon", cashPrice = 1950, goldPrice = 94, sellPrice = 1170, invLimit = 400 },
-                    ["wagon03x"]          = { label = "Open Wagon 1", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon05x"]          = { label = "Open Wagon 2", cashPrice = 1050, goldPrice = 51, sellPrice = 630, invLimit = 400 },
-                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750, invLimit = 400 },
-                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
-                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2", cashPrice = 1500, goldPrice = 73, sellPrice = 900, invLimit = 400 },
+                    ["supplywagon"]       = { label = "Supply Wagon",    cashPrice = 950,  goldPrice = 46, sellPrice = 570  },
+                    ["wagontraveller01x"] = { label = "Travel Wagon",    cashPrice = 1950, goldPrice = 94, sellPrice = 1170 },
+                    ["wagon03x"]          = { label = "Open Wagon 1",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon05x"]          = { label = "Open Wagon 2",    cashPrice = 1050, goldPrice = 51, sellPrice = 630  },
+                    ["wagon02x"]          = { label = "Covered Wagon 1", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon04x"]          = { label = "Covered Wagon 2", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["wagon06x"]          = { label = "Covered Wagon 3", cashPrice = 1250, goldPrice = 60, sellPrice = 750  },
+                    ["chuckwagon000x"]    = { label = "Chuck Wagon 1",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
+                    ["chuckwagon002x"]    = { label = "Chuck Wagon 2",   cashPrice = 1500, goldPrice = 73, sellPrice = 900  },
                 }
             }
         }

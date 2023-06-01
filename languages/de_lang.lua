@@ -9,7 +9,7 @@ Locales["de_lang"] = {
     shortGold = "Du hast nicht genug Dollar",
     shortCash = "Du hast nicht genug Dollar",
     wagonReturned = " wurde ~o~zurückgeschickt",
-    noWagon = "Du hast keine Kutsche",
+    noWagonReturn = "Du hast keine Kutsche",
     noOwnedWagons = "Du besitzt keine Kutschen",
     needJob = "Du brauchst folgenden Job: ~o~",
     wagonLimit = "Du kannst maximal ~o~",
@@ -18,5 +18,6 @@ Locales["de_lang"] = {
     frcash = "~q~ für ~t6~$",
     nameWagon = "Benenne deine Kutsche:",
     wagonInv = "Kutschenlager",
-    tooClose = "Hier kannst du deine Kutsche nicht rufen"
+    tooClose = "Hier kannst du deine Kutsche nicht rufen",
+    noWagon = "You don't have a wagon out"
 }

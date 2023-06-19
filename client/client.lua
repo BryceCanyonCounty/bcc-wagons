@@ -645,6 +645,10 @@ RegisterCommand('wagonEnter', function(rawCommand)
     end
 end)
 
+RegisterCommand('wagonReturn', function()
+    ReturnWagon()
+end)
+
 -- Menu Prompts
 function ShopOpen()
     local str = _U('shopPrompt')

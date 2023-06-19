@@ -39,35 +39,33 @@ CreateThread(function()
         local dead = IsEntityDead(player)
         local hour = GetClockHours()
 
-        if InMenu == false and not dead then
+        if not InMenu and not dead then
             for shopId, shopConfig in pairs(Config.shops) do
                 if shopConfig.shopHours then
                     -- Using Shop Hours - Shop Closed
                     if hour >= shopConfig.shopClose or hour < shopConfig.shopOpen then
-                        if Config.blipAllowedClosed then
-                            if not Config.shops[shopId].BlipHandle and shopConfig.blipAllowed then
+                        if Config.blipOnClosed then
+                            if not Config.shops[shopId].Blip and shopConfig.blipOn then
                                 AddBlip(shopId)
                             end
                         else
-                            if Config.shops[shopId].BlipHandle then
-                                RemoveBlip(Config.shops[shopId].BlipHandle)
-                                Config.shops[shopId].BlipHandle = nil
+                            if Config.shops[shopId].Blip then
+                                RemoveBlip(Config.shops[shopId].Blip)
+                                Config.shops[shopId].Blip = nil
                             end
                         end
-                        if Config.shops[shopId].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].BlipHandle, joaat(Config.BlipColors[shopConfig.blipColorClosed])) -- BlipAddModifier
+                        if Config.shops[shopId].Blip then
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].Blip, joaat(Config.BlipColors[shopConfig.blipColorClosed])) -- BlipAddModifier
                         end
                         if shopConfig.NPC then
                             DeleteEntity(shopConfig.NPC)
-                            DeletePed(shopConfig.NPC)
-                            SetEntityAsNoLongerNeeded(shopConfig.NPC)
                             shopConfig.NPC = nil
                         end
-                        local coordsDist = vector3(coords.x, coords.y, coords.z)
-                        local coordsShop = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
-                        local distanceShop = #(coordsDist - coordsShop)
+                        local pcoords = vector3(coords.x, coords.y, coords.z)
+                        local scoords = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
+                        local sDistance = #(pcoords - scoords)
 
-                        if (distanceShop <= shopConfig.distanceShop) then
+                        if sDistance <= shopConfig.sDistance then
                             sleep = false
                             local shopClosed = CreateVarString(10, 'LITERAL_STRING', shopConfig.shopName .. _U('closed'))
                             PromptSetActiveGroupThisFrame(ClosedGroup, shopClosed)
@@ -79,21 +77,28 @@ CreateThread(function()
                         end
                     elseif hour >= shopConfig.shopOpen then
                         -- Using Shop Hours - Shop Open
-                        if not Config.shops[shopId].BlipHandle and shopConfig.blipAllowed then
+                        if not Config.shops[shopId].Blip and shopConfig.blipOn then
                             AddBlip(shopId)
                         end
-                        if not shopConfig.NPC and shopConfig.npcAllowed then
-                            SpawnNPC(shopId)
-                        end
                         if not next(shopConfig.allowedJobs) then
-                            if Config.shops[shopId].BlipHandle then
-                                Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].BlipHandle, joaat(Config.BlipColors[shopConfig.blipColorOpen])) -- BlipAddModifier
+                            if Config.shops[shopId].Blip then
+                                Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].Blip, joaat(Config.BlipColors[shopConfig.blipColorOpen])) -- BlipAddModifier
                             end
-                            local coordsDist = vector3(coords.x, coords.y, coords.z)
-                            local coordsShop = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
-                            local distanceShop = #(coordsDist - coordsShop)
+                            local pcoords = vector3(coords.x, coords.y, coords.z)
+                            local scoords = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
+                            local sDistance = #(pcoords - scoords)
 
-                            if (distanceShop <= shopConfig.distanceShop) then
+                            if sDistance <= shopConfig.nDistance then
+                                if not shopConfig.NPC and shopConfig.npcOn then
+                                    AddNPC(shopId)
+                                end
+                            else
+                                if shopConfig.NPC then
+                                    DeleteEntity(shopConfig.NPC)
+                                    shopConfig.NPC = nil
+                                end
+                            end
+                            if sDistance <= shopConfig.sDistance then
                                 sleep = false
                                 local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopConfig.promptName)
                                 PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
@@ -107,14 +112,24 @@ CreateThread(function()
                             end
                         else
                             -- Using Shop Hours - Shop Open - Job Locked
-                            if Config.shops[shopId].BlipHandle then
-                                Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].BlipHandle, joaat(Config.BlipColors[shopConfig.blipColorJob])) -- BlipAddModifier
+                            if Config.shops[shopId].Blip then
+                                Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].Blip, joaat(Config.BlipColors[shopConfig.blipColorJob])) -- BlipAddModifier
                             end
-                            local coordsDist = vector3(coords.x, coords.y, coords.z)
-                            local coordsShop = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
-                            local distanceShop = #(coordsDist - coordsShop)
+                            local pcoords = vector3(coords.x, coords.y, coords.z)
+                            local scoords = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
+                            local sDistance = #(pcoords - scoords)
 
-                            if (distanceShop <= shopConfig.distanceShop) then
+                            if sDistance <= shopConfig.nDistance then
+                                if not shopConfig.NPC and shopConfig.npcOn then
+                                    AddNPC(shopId)
+                                end
+                            else
+                                if shopConfig.NPC then
+                                    DeleteEntity(shopConfig.NPC)
+                                    shopConfig.NPC = nil
+                                end
+                            end
+                            if sDistance <= shopConfig.sDistance then
                                 sleep = false
                                 local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopConfig.promptName)
                                 PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
@@ -158,21 +173,28 @@ CreateThread(function()
                     end
                 else
                     -- Not Using Shop Hours - Shop Always Open
-                    if not Config.shops[shopId].BlipHandle and shopConfig.blipAllowed then
+                    if not Config.shops[shopId].Blip and shopConfig.blipOn then
                         AddBlip(shopId)
                     end
-                    if not shopConfig.NPC and shopConfig.npcAllowed then
-                        SpawnNPC(shopId)
-                    end
                     if not next(shopConfig.allowedJobs) then
-                        if Config.shops[shopId].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].BlipHandle, joaat(Config.BlipColors[shopConfig.blipColorOpen])) -- BlipAddModifier
+                        if Config.shops[shopId].Blip then
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].Blip, joaat(Config.BlipColors[shopConfig.blipColorOpen])) -- BlipAddModifier
                         end
-                        local coordsDist = vector3(coords.x, coords.y, coords.z)
-                        local coordsShop = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
-                        local distanceShop = #(coordsDist - coordsShop)
+                        local pcoords = vector3(coords.x, coords.y, coords.z)
+                        local scoords = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
+                        local sDistance = #(pcoords - scoords)
 
-                        if (distanceShop <= shopConfig.distanceShop) then
+                        if sDistance <= shopConfig.nDistance then
+                            if not shopConfig.NPC and shopConfig.npcOn then
+                                AddNPC(shopId)
+                            end
+                        else
+                            if shopConfig.NPC then
+                                DeleteEntity(shopConfig.NPC)
+                                shopConfig.NPC = nil
+                            end
+                        end
+                        if sDistance <= shopConfig.sDistance then
                             sleep = false
                             local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopConfig.promptName)
                             PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
@@ -186,14 +208,24 @@ CreateThread(function()
                         end
                     else
                         -- Not Using Shop Hours - Shop Always Open - Job Locked
-                        if Config.shops[shopId].BlipHandle then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].BlipHandle, joaat(Config.BlipColors[shopConfig.blipColorJob])) -- BlipAddModifier
+                        if Config.shops[shopId].Blip then
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shopId].Blip, joaat(Config.BlipColors[shopConfig.blipColorJob])) -- BlipAddModifier
                         end
-                        local coordsDist = vector3(coords.x, coords.y, coords.z)
-                        local coordsShop = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
-                        local distanceShop = #(coordsDist - coordsShop)
+                        local pcoords = vector3(coords.x, coords.y, coords.z)
+                        local scoords = vector3(shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z)
+                        local sDistance = #(pcoords - scoords)
 
-                        if (distanceShop <= shopConfig.distanceShop) then
+                        if sDistance <= shopConfig.nDistance then
+                            if not shopConfig.NPC and shopConfig.npcOn then
+                                AddNPC(shopId)
+                            end
+                        else
+                            if shopConfig.NPC then
+                                DeleteEntity(shopConfig.NPC)
+                                shopConfig.NPC = nil
+                            end
+                        end
+                        if sDistance <= shopConfig.sDistance then
                             sleep = false
                             local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopConfig.promptName)
                             PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
@@ -310,24 +342,30 @@ RegisterNUICallback('BuyWagon', function(data, cb)
 end)
 
 RegisterNetEvent('bcc-wagons:SetWagonName', function(data, rename)
-    SendNUIMessage({ action = 'hide' })
+    SendNUIMessage({
+        action = 'hide'
+    })
     SetNuiFocus(false, false)
     Wait(200)
 
-    local wagonName = ''
     CreateThread(function()
         AddTextEntry('FMMC_MPM_NA', _U('nameWagon'))
         DisplayOnscreenKeyboard(1, 'FMMC_MPM_NA', '', '', '', '', '', 30)
-        while (UpdateOnscreenKeyboard() == 0) do
+        while UpdateOnscreenKeyboard() == 0 do
             DisableAllControlActions(0)
             Wait(0)
         end
-        if (GetOnscreenKeyboardResult()) then
-            wagonName = GetOnscreenKeyboardResult()
-            if not rename then
-                TriggerServerEvent('bcc-wagons:SaveNewWagon', data, wagonName)
+        if GetOnscreenKeyboardResult() then
+            local wagonName = GetOnscreenKeyboardResult()
+            if string.len(wagonName) > 0 then
+                if not rename then
+                    TriggerServerEvent('bcc-wagons:SaveNewWagon', data, wagonName)
+                else
+                    TriggerServerEvent('bcc-wagons:UpdateWagonName', data, wagonName)
+                end
             else
-                TriggerServerEvent('bcc-wagons:UpdateWagonName', data, wagonName)
+                TriggerEvent('bcc-wagons:SetWagonName', data, rename)
+                return
             end
 
             SendNUIMessage({
@@ -347,8 +385,7 @@ end)
 -- Rename Owned Wagon
 RegisterNUICallback('RenameWagon', function(data, cb)
     cb('ok')
-    local rename = true
-    TriggerEvent('bcc-wagons:SetWagonName', data, rename)
+    TriggerEvent('bcc-wagons:SetWagonName', data, true)
 end)
 
 -- Select Active Wagon
@@ -428,7 +465,7 @@ RegisterNetEvent('bcc-wagons:SpawnWagon', function(wagonModel, name, menuSpawn, 
         end
         spawnPosition = nodePosition
 
-        MyWagon = CreateVehicle(model, spawnPosition, GetEntityHeading(player), true, false)
+        MyWagon = CreateVehicle(model, spawnPosition, 0.0, true, false)
         Citizen.InvokeNative(0x7263332501E07F52, MyWagon, true) -- SetVehicleOnGroundProperly
         SetModelAsNoLongerNeeded(model)
     end
@@ -445,25 +482,26 @@ end)
 RegisterNUICallback('SellWagon', function(data, cb)
     cb('ok')
     DeleteEntity(MyEntity)
+    Cam = false
     TriggerServerEvent('bcc-wagons:SellWagon', data, ShopId)
 end)
 
 -- Close Main Menu
 RegisterNUICallback('CloseMenu', function(data, cb)
     cb('ok')
-
-    SendNUIMessage({ action = 'hide' })
+    SendNUIMessage({
+        action = 'hide'
+    })
     SetNuiFocus(false, false)
 
     if ShopEntity then
         DeleteEntity(ShopEntity)
+        ShopEntity = nil
     end
-    ShopEntity = nil
-
     if MyEntity then
         DeleteEntity(MyEntity)
+        MyEntity = nil
     end
-    MyEntity = nil
 
     Cam = false
     DestroyAllCams(true)
@@ -611,56 +649,53 @@ end)
 function ShopOpen()
     local str = _U('shopPrompt')
     OpenShops = PromptRegisterBegin()
-    PromptSetControlAction(OpenShops, Config.shopKey)
+    PromptSetControlAction(OpenShops, Config.keys.shop)
     str = CreateVarString(10, 'LITERAL_STRING', str)
     PromptSetText(OpenShops, str)
     PromptSetEnabled(OpenShops, 1)
     PromptSetVisible(OpenShops, 1)
     PromptSetStandardMode(OpenShops, 1)
     PromptSetGroup(OpenShops, OpenGroup)
-    Citizen.InvokeNative(0xC5F428EE08FA7F2C, OpenShops, true) -- UiPromptSetUrgentPulsingEnabled
     PromptRegisterEnd(OpenShops)
 end
 
 function ShopClosed()
     local str = _U('shopPrompt')
     CloseShops = PromptRegisterBegin()
-    PromptSetControlAction(CloseShops, Config.shopKey)
+    PromptSetControlAction(CloseShops, Config.keys.shop)
     str = CreateVarString(10, 'LITERAL_STRING', str)
     PromptSetText(CloseShops, str)
     PromptSetEnabled(CloseShops, 1)
     PromptSetVisible(CloseShops, 1)
     PromptSetStandardMode(CloseShops, 1)
     PromptSetGroup(CloseShops, ClosedGroup)
-    Citizen.InvokeNative(0xC5F428EE08FA7F2C, CloseShops, true) -- UiPromptSetUrgentPulsingEnabled
     PromptRegisterEnd(CloseShops)
 end
 
 function ReturnOpen()
     local str = _U('returnPrompt')
     OpenReturn = PromptRegisterBegin()
-    PromptSetControlAction(OpenReturn, Config.returnKey)
+    PromptSetControlAction(OpenReturn, Config.keys.ret)
     str = CreateVarString(10, 'LITERAL_STRING', str)
     PromptSetText(OpenReturn, str)
     PromptSetEnabled(OpenReturn, 1)
     PromptSetVisible(OpenReturn, 1)
     PromptSetStandardMode(OpenReturn, 1)
     PromptSetGroup(OpenReturn, OpenGroup)
-    Citizen.InvokeNative(0xC5F428EE08FA7F2C, OpenReturn, true) -- UiPromptSetUrgentPulsingEnabled
     PromptRegisterEnd(OpenReturn)
 end
 
 -- Blips
 function AddBlip(shopId)
     local shopConfig = Config.shops[shopId]
-    shopConfig.BlipHandle = N_0x554d9d53f696d002(1664425300, shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z) -- BlipAddForCoords
-    SetBlipSprite(shopConfig.BlipHandle, shopConfig.blipSprite, 1)
-    SetBlipScale(shopConfig.BlipHandle, 0.2)
-    Citizen.InvokeNative(0x9CB1A1623062F402, shopConfig.BlipHandle, shopConfig.blipName) -- SetBlipName
+    shopConfig.Blip = N_0x554d9d53f696d002(1664425300, shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z) -- BlipAddForCoords
+    SetBlipSprite(shopConfig.Blip, shopConfig.blipSprite, 1)
+    SetBlipScale(shopConfig.Blip, 0.2)
+    Citizen.InvokeNative(0x9CB1A1623062F402, shopConfig.Blip, shopConfig.blipName) -- SetBlipName
 end
 
 -- NPCs
-function SpawnNPC(shopId)
+function AddNPC(shopId)
     local shopConfig = Config.shops[shopId]
     LoadModel(shopConfig.npcModel)
     local npc = CreatePed(shopConfig.npcModel, shopConfig.npc.x, shopConfig.npc.y, shopConfig.npc.z - 1.0,
@@ -702,9 +737,11 @@ AddEventHandler('onResourceStop', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
         return
     end
-    if InMenu == true then
+    if InMenu then
         SetNuiFocus(false, false)
-        SendNUIMessage({ action = 'hide' })
+        SendNUIMessage({
+            action = 'hide'
+        })
     end
     ClearPedTasksImmediately(PlayerPedId())
     PromptDelete(OpenShops)
@@ -719,13 +756,12 @@ AddEventHandler('onResourceStop', function(resourceName)
     end
 
     for _, shopConfig in pairs(Config.shops) do
-        if shopConfig.BlipHandle then
-            RemoveBlip(shopConfig.BlipHandle)
+        if shopConfig.Blip then
+            RemoveBlip(shopConfig.Blip)
         end
         if shopConfig.NPC then
             DeleteEntity(shopConfig.NPC)
-            DeletePed(shopConfig.NPC)
-            SetEntityAsNoLongerNeeded(shopConfig.NPC)
+            shopConfig.NPC = nil
         end
     end
 end)

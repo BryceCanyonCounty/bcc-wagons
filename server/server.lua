@@ -23,10 +23,9 @@ RegisterNetEvent('bcc-wagons:BuyWagon', function(data)
                 return
             end
             if data.IsCash then
-                local charCash = Character.money
                 local cashPrice = data.Cash
 
-                if charCash >= cashPrice then
+                if Character.money >= cashPrice then
                     Character.removeCurrency(0, cashPrice)
                 else
                     VORPcore.NotifyRightTip(_source, _U('shortCash'), 5000)
@@ -34,10 +33,9 @@ RegisterNetEvent('bcc-wagons:BuyWagon', function(data)
                     return
                 end
             else
-                local charGold = Character.gold
                 local goldPrice = data.Gold
 
-                if charGold >= goldPrice then
+                if Character.gold >= goldPrice then
                     Character.removeCurrency(1, goldPrice)
                 else
                     VORPcore.NotifyRightTip(_source, _U('shortGold'), 5000)
@@ -144,7 +142,7 @@ RegisterNetEvent('bcc-wagons:SellWagon', function(data, shopId)
                     for _, wagonModels in pairs(Config.shops[shopId].wagons) do
                         for model, wagonConfig in pairs(wagonModels['types']) do
                             if model == modelWagon then
-                                local sellPrice = wagonConfig.sellPrice
+                                local sellPrice = (Config.sellPrice * wagonConfig.cashPrice)
                                 Character.addCurrency(0, sellPrice)
                                 VORPcore.NotifyRightTip(_source, _U('soldWagon') .. data.WagonName .. _U('frcash') .. sellPrice, 5000)
                             end
@@ -161,7 +159,7 @@ end)
 RegisterNetEvent('bcc-wagons:RegisterInventory', function(id, wagonModel)
     for model, invConfig in pairs(Config.inventory) do
         if model == wagonModel then
-            VORPInv.registerInventory('wagon_' .. tostring(id), _U('wagonInv'), tonumber(invConfig.invLimit))
+            VORPInv.registerInventory('wagon_' .. tostring(id), _U('wagonInv'), tonumber(invConfig.invLimit), true, false, true)
         end
     end
 end)

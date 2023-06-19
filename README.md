@@ -20,7 +20,7 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Distance-based NPC spawns
 
 #### Commands
-
+- Command `/wagonEnter` if you have trouble getting to your wagon
 - Command `/wagonReturn` to return wagon when away from a shop
 
 #### Dependencies

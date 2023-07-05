@@ -9,67 +9,69 @@ VORPInv = exports.vorp_inventory:vorp_inventoryApi()
 
 -- Buy New Wagons
 RegisterNetEvent('bcc-wagons:BuyWagon', function(data)
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
     local maxWagons = Config.maxWagons
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', { identifier, charid },
-        function(wagons)
-            if #wagons >= maxWagons then
-                VORPcore.NotifyRightTip(_source, _U('wagonLimit') .. maxWagons .. _U('wagons'), 5000)
-                TriggerClientEvent('bcc-wagons:WagonMenu', _source)
+    function(wagons)
+        if #wagons >= maxWagons then
+            VORPcore.NotifyRightTip(src, _U('wagonLimit') .. maxWagons .. _U('wagons'), 5000)
+            TriggerClientEvent('bcc-wagons:WagonMenu', src)
+            return
+        end
+        if data.IsCash then
+            if Character.money >= data.Cash then
+                TriggerClientEvent('bcc-wagons:SetWagonName', src, data, false)
+            else
+                VORPcore.NotifyRightTip(src, _U('shortCash'), 5000)
+                TriggerClientEvent('bcc-wagons:WagonMenu', src)
                 return
             end
-            if data.IsCash then
-                local cashPrice = data.Cash
-
-                if Character.money >= cashPrice then
-                    Character.removeCurrency(0, cashPrice)
-                else
-                    VORPcore.NotifyRightTip(_source, _U('shortCash'), 5000)
-                    TriggerClientEvent('bcc-wagons:WagonMenu', _source)
-                    return
-                end
+        else
+            if Character.gold >= data.Gold then
+                TriggerClientEvent('bcc-wagons:SetWagonName', src, data, false)
             else
-                local goldPrice = data.Gold
-
-                if Character.gold >= goldPrice then
-                    Character.removeCurrency(1, goldPrice)
-                else
-                    VORPcore.NotifyRightTip(_source, _U('shortGold'), 5000)
-                    TriggerClientEvent('bcc-wagons:WagonMenu', _source)
-                    return
-                end
+                VORPcore.NotifyRightTip(src, _U('shortGold'), 5000)
+                TriggerClientEvent('bcc-wagons:WagonMenu', src)
+                return
             end
-            local rename = false
-            TriggerClientEvent('bcc-wagons:SetWagonName', _source, data, rename)
-        end)
+        end
+    end)
 end)
 
 -- Save New Wagon Purchase to Database
 RegisterNetEvent('bcc-wagons:SaveNewWagon', function(data, name)
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
 
     MySQL.Async.execute('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)', { identifier, charid, name, data.ModelW },
     function(done)
+        if data.IsCash then
+            Character.removeCurrency(0, data.Cash)
+        else
+            Character.removeCurrency(1, data.Gold)
+        end
+        TriggerClientEvent('bcc-wagons:WagonMenu', src)
     end)
 end)
 
 -- Rename Owned Wagons
 RegisterNetEvent('bcc-wagons:UpdateWagonName', function(data, name)
+    local src = source
     MySQL.Async.execute('UPDATE player_wagons SET name = ? WHERE id = ?', { name, data.WagonId },
     function(done)
+        TriggerClientEvent('bcc-wagons:WagonMenu', src)
     end)
 end)
 
 RegisterNetEvent('bcc-wagons:SelectWagon', function(data)
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
     local id = tonumber(data.WagonId)
@@ -91,8 +93,8 @@ end)
 
 -- Get Selected Player Owned Wagon
 RegisterNetEvent('bcc-wagons:GetSelectedWagon', function()
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', { identifier, charid },
@@ -101,32 +103,32 @@ RegisterNetEvent('bcc-wagons:GetSelectedWagon', function()
             for i = 1, #wagons do
                 if wagons[i].selected == 1 then
                     local menuSpawn = false
-                    TriggerClientEvent('bcc-wagons:SpawnWagon', _source, wagons[i].model, wagons[i].name, menuSpawn, wagons[i].id)
+                    TriggerClientEvent('bcc-wagons:SpawnWagon', src, wagons[i].model, wagons[i].name, menuSpawn, wagons[i].id)
                 end
             end
         else
-            VORPcore.NotifyRightTip(_source, _U('noOwnedWagons'), 5000)
+            VORPcore.NotifyRightTip(src, _U('noOwnedWagons'), 5000)
         end
     end)
 end)
 
 -- Get Player Owned Wagons
 RegisterNetEvent('bcc-wagons:GetMyWagons', function()
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
 
     MySQL.Async.fetchAll('SELECT * FROM player_wagons WHERE identifier = ? AND charid = ?', { identifier, charid },
     function(wagons)
-        TriggerClientEvent('bcc-wagons:WagonsData', _source, wagons)
+        TriggerClientEvent('bcc-wagons:WagonsData', src, wagons)
     end)
 end)
 
 -- Sell Player Owned Wagons
 RegisterNetEvent('bcc-wagons:SellWagon', function(data, shopId)
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
     local modelWagon = nil
@@ -144,14 +146,14 @@ RegisterNetEvent('bcc-wagons:SellWagon', function(data, shopId)
                             if model == modelWagon then
                                 local sellPrice = (Config.sellPrice * wagonConfig.cashPrice)
                                 Character.addCurrency(0, sellPrice)
-                                VORPcore.NotifyRightTip(_source, _U('soldWagon') .. data.WagonName .. _U('frcash') .. sellPrice, 5000)
+                                VORPcore.NotifyRightTip(src, _U('soldWagon') .. data.WagonName .. _U('frcash') .. sellPrice, 5000)
                             end
                         end
                     end
                 end)
             end
         end
-        TriggerClientEvent('bcc-wagons:WagonMenu', _source)
+        TriggerClientEvent('bcc-wagons:WagonMenu', src)
     end)
 end)
 
@@ -166,15 +168,15 @@ end)
 
 -- Open Wagon Inventory
 RegisterNetEvent('bcc-wagons:OpenInventory', function(id)
-    local _source = source
-    VORPInv.OpenInv(_source, 'wagon_' .. tostring(id))
+    local src = source
+    VORPInv.OpenInv(src, 'wagon_' .. tostring(id))
 end)
 
 -- Check Player Job and Job Grade
 RegisterNetEvent('bcc-wagons:getPlayerJob', function()
-    local _source = source
-    local Character = VORPcore.getUser(_source).getUsedCharacter
+    local src = source
+    local Character = VORPcore.getUser(src).getUsedCharacter
     local CharacterJob = Character.job
     local CharacterGrade = Character.jobGrade
-    TriggerClientEvent('bcc-wagons:sendPlayerJob', _source, CharacterJob, CharacterGrade)
+    TriggerClientEvent('bcc-wagons:sendPlayerJob', src, CharacterJob, CharacterGrade)
 end)

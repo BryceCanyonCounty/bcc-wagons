@@ -1,10 +1,8 @@
 local VORPcore = {}
 local VORPInv = {}
-
 TriggerEvent('getCore', function(core)
     VORPcore = core
 end)
-
 VORPInv = exports.vorp_inventory:vorp_inventoryApi()
 
 -- Buy New Wagons
@@ -102,8 +100,7 @@ RegisterNetEvent('bcc-wagons:GetSelectedWagon', function()
         if #wagons ~= 0 then
             for i = 1, #wagons do
                 if wagons[i].selected == 1 then
-                    local menuSpawn = false
-                    TriggerClientEvent('bcc-wagons:SpawnWagon', src, wagons[i].model, wagons[i].name, menuSpawn, wagons[i].id)
+                    TriggerClientEvent('bcc-wagons:SpawnWagon', src, wagons[i].model, wagons[i].name, false, wagons[i].id)
                 end
             end
         else

@@ -28,7 +28,7 @@ CreateThread(function()
     while true do
         Wait(0)
         local player = PlayerPedId()
-        local pcoords = GetEntityCoords(player)
+        local pCoords = GetEntityCoords(player)
         local sleep = true
         local hour = GetClockHours()
 
@@ -37,67 +37,42 @@ CreateThread(function()
                 if shopCfg.shopHours then
                     -- Using Shop Hours - Shop Closed
                     if hour >= shopCfg.shopClose or hour < shopCfg.shopOpen then
-<<<<<<< Updated upstream
-                        if Config.blipOnClosed then
-                            if not Config.shops[shop].Blip and shopCfg.blipOn then
-                                AddBlip(shop)
-                            end
-=======
                         if shopCfg.blipOn and Config.blipOnClosed and not Config.shops[shop].Blip then
                             AddBlip(shop)
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipClosed])) -- BlipAddModifier
->>>>>>> Stashed changes
                         else
                             if Config.shops[shop].Blip then
                                 RemoveBlip(Config.shops[shop].Blip)
                                 Config.shops[shop].Blip = nil
                             end
                         end
-                        if Config.shops[shop].Blip then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipClosed])) -- BlipAddModifier
-                        end
                         if shopCfg.NPC then
                             DeleteEntity(shopCfg.NPC)
                             shopCfg.NPC = nil
                         end
-                        local sDist = #(pcoords - shopCfg.npc)
+                        local sDist = #(pCoords - shopCfg.npc)
                         if sDist <= shopCfg.sDistance then
                             sleep = false
                             local shopClosed = CreateVarString(10, 'LITERAL_STRING', shopCfg.shopName .. _U('closed'))
                             PromptSetActiveGroupThisFrame(ClosedGroup, shopClosed)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseShops) then -- UiPromptHasStandardModeCompleted
-                                Wait(100)
                                 VORPcore.NotifyRightTip(shopCfg.shopName .. _U('hours') .. shopCfg.shopOpen .. _U('to') .. shopCfg.shopClose .. _U('hundred'), 4000)
                             end
                         end
                     elseif hour >= shopCfg.shopOpen then
                         -- Using Shop Hours - Shop Open
-<<<<<<< Updated upstream
-                        if not Config.shops[shop].Blip and shopCfg.blipOn then
-=======
                         if shopCfg.blipOn and not Config.shops[shop].Blip then
->>>>>>> Stashed changes
                             AddBlip(shop)
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipOpen])) -- BlipAddModifier
                         end
                         if not next(shopCfg.allowedJobs) then
-<<<<<<< Updated upstream
-                            if Config.shops[shop].Blip then
-                                Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipOpen])) -- BlipAddModifier
-                            end
-                            local sDist = #(pcoords - shopCfg.npc)
-                            if sDist <= shopCfg.nDistance then
-                                if not shopCfg.NPC and shopCfg.npcOn then
-                                    AddNPC(shop)
-=======
                             local sDist = #(pCoords - shopCfg.npc)
                             if shopCfg.npcOn then
                                 if sDist <= shopCfg.nDistance then
                                     if not shopCfg.NPC then
                                         AddNPC(shop)
                                     end
->>>>>>> Stashed changes
                                 end
                             else
                                 if shopCfg.NPC then
@@ -111,7 +86,6 @@ CreateThread(function()
                                 PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
 
                                 if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                    DisplayRadar(false)
                                     OpenMenu(shop)
                                 elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
                                     ReturnWagon()
@@ -122,9 +96,6 @@ CreateThread(function()
                             if Config.shops[shop].Blip then
                                 Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipJob])) -- BlipAddModifier
                             end
-<<<<<<< Updated upstream
-                            local sDist = #(pcoords - shopCfg.npc)
-=======
                             local sDist = #(pCoords - shopCfg.npc)
                             if shopCfg.npcOn then
                                 if sDist <= shopCfg.nDistance then
@@ -173,72 +144,10 @@ CreateThread(function()
                     if not next(shopCfg.allowedJobs) then
                         local sDist = #(pCoords - shopCfg.npc)
                         if shopCfg.npcOn then
->>>>>>> Stashed changes
                             if sDist <= shopCfg.nDistance then
-                                if not shopCfg.NPC and shopCfg.npcOn then
+                                if not shopCfg.NPC then
                                     AddNPC(shop)
                                 end
-                            end
-                        else
-                            if shopCfg.NPC then
-                                DeleteEntity(shopCfg.NPC)
-                                shopCfg.NPC = nil
-                            end
-                            if sDist <= shopCfg.sDistance then
-                                sleep = false
-                                local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                                PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
-
-                                if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                    TriggerServerEvent('bcc-wagons:GetPlayerJob')
-                                    Wait(200)
-                                    if PlayerJob then
-                                        if CheckJob(shopCfg.allowedJobs, PlayerJob) then
-                                            if tonumber(shopCfg.jobGrade) <= tonumber(JobGrade) then
-                                                DisplayRadar(false)
-                                                OpenMenu(shop)
-                                            else
-                                                VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                            end
-                                        else
-                                            VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                        end
-                                    else
-                                        VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                    end
-                                elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                    TriggerServerEvent('bcc-wagons:GetPlayerJob')
-                                    Wait(200)
-                                    if PlayerJob then
-                                        if CheckJob(shopCfg.allowedJobs, PlayerJob) then
-                                            if tonumber(shopCfg.jobGrade) <= tonumber(JobGrade) then
-                                                ReturnWagon()
-                                            else
-                                                VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                            end
-                                        else
-                                            VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                        end
-                                    else
-                                        VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                else
-                    -- Not Using Shop Hours - Shop Always Open
-                    if not Config.shops[shop].Blip and shopCfg.blipOn then
-                        AddBlip(shop)
-                    end
-                    if not next(shopCfg.allowedJobs) then
-                        if Config.shops[shop].Blip then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipOpen])) -- BlipAddModifier
-                        end
-                        local sDist = #(pcoords - shopCfg.npc)
-                        if sDist <= shopCfg.nDistance then
-                            if not shopCfg.NPC and shopCfg.npcOn then
-                                AddNPC(shop)
                             end
                         else
                             if shopCfg.NPC then
@@ -262,19 +171,12 @@ CreateThread(function()
                         if Config.shops[shop].Blip then
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipJob])) -- BlipAddModifier
                         end
-<<<<<<< Updated upstream
-                        local sDist = #(pcoords - shopCfg.npc)
-                        if sDist <= shopCfg.nDistance then
-                            if not shopCfg.NPC and shopCfg.npcOn then
-                                AddNPC(shop)
-=======
                         local sDist = #(pCoords - shopCfg.npc)
                         if shopCfg.npcOn then
                             if sDist <= shopCfg.nDistance then
                                 if not shopCfg.NPC then
                                     AddNPC(shop)
                                 end
->>>>>>> Stashed changes
                             end
                         else
                             if shopCfg.NPC then
@@ -287,39 +189,23 @@ CreateThread(function()
                             local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
                             PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
 
+                            local args = shop
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                TriggerServerEvent('bcc-wagons:GetPlayerJob')
-                                Wait(200)
-                                if PlayerJob then
-                                    if CheckJob(shopCfg.allowedJobs, PlayerJob) then
-                                        if tonumber(shopCfg.jobGrade) <= tonumber(JobGrade) then
-                                            DisplayRadar(false)
-                                            OpenMenu(shop)
-                                        else
-                                            VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                        end
+                                VORPcore.RpcCall('CheckPlayerJob', function(result)
+                                    if result then
+                                        OpenMenu(shop)
                                     else
-                                        VORPcore.NotifyRightTip(_U('needJob'), 5000)
+                                        return
                                     end
-                                else
-                                    VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                end
+                                end, args)
                             elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                TriggerServerEvent('bcc-wagons:GetPlayerJob')
-                                Wait(200)
-                                if PlayerJob then
-                                    if CheckJob(shopCfg.allowedJobs, PlayerJob) then
-                                        if tonumber(shopCfg.jobGrade) <= tonumber(JobGrade) then
-                                            ReturnWagon()
-                                        else
-                                            VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                        end
+                                VORPcore.RpcCall('CheckPlayerJob', function(result)
+                                    if result then
+                                        ReturnWagon()
                                     else
-                                        VORPcore.NotifyRightTip(_U('needJob'), 5000)
+                                        return
                                     end
-                                else
-                                    VORPcore.NotifyRightTip(_U('needJob'), 5000)
-                                end
+                                end, args)
                             end
                         end
                     end
@@ -334,6 +220,7 @@ end)
 
 -- Open Main Menu
 function OpenMenu(shop)
+    DisplayRadar(false)
     InMenu = true
     Shop = shop
     ShopName = Config.shops[Shop].shopName
@@ -852,21 +739,6 @@ function LoadModel(npcModel)
         Wait(10)
     end
 end
-
--- Check if Player has Job
-function CheckJob(allowedJob, playerJob)
-    for _, jobAllowed in pairs(allowedJob) do
-        if jobAllowed == playerJob then
-            return true
-        end
-    end
-    return false
-end
-
-RegisterNetEvent('bcc-wagons:sendPlayerJob', function(Job, grade)
-    PlayerJob = Job
-    JobGrade = grade
-end)
 
 AddEventHandler('onResourceStop', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then

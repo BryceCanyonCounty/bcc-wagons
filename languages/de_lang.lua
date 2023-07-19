@@ -12,6 +12,7 @@ Locales["de_lang"] = {
     noWagonReturn = "Du hast keine Kutsche",
     noOwnedWagons = "Du besitzt keine Kutschen",
     needJob = "You don't have the required job!",
+    needJobGrade = "You don't have the required job grade!",
     wagonLimit = "Du kannst maximal ~o~",
     wagons = "~q~ Kutschen besitzen!",
     soldWagon = "Kutsche verkauft ~o~",

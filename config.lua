@@ -5,10 +5,11 @@ Config.defaultlang = 'en_lang'
 -----------------------------------------------------
 
 Config.keys = {
-    shop = 0x760A9C6F, -- [G] Open Wagon Shop Menu
-    ret  = 0xD9D0E1C0, -- [spacebar] Return Wagon to Shop at Prompt
-    call = 0xF3830D8E, -- [J] Call Selected Wagon
-    inv  = 0xD8F73058  -- [U] Open Wagon Inventory
+    shop      = 0x760A9C6F, -- [G] Open Wagon Shop Menu
+    ret       = 0xD9D0E1C0, -- [spacebar] Return Wagon at Shop
+    call      = 0xF3830D8E, -- [J] Call Selected Wagon
+    inv       = 0xD8F73058, -- [U] Open Wagon Inventory
+    targetRet = 0x760A9C6F, -- [G] Target Menu Wagon Return
 }
 -----------------------------------------------------
 
@@ -18,6 +19,7 @@ Config.maxWagons = 5 -- Default: 5
 
 -- Places Wagon Name Above Wagon When Wagon is Empty
 Config.wagonTag = true --Default: true / Set to false to disable
+Config.wagonTagDist = 15 -- Default: 15 / Distance from Wagon to Show Tag
 -----------------------------------------------------
 
 -- Set a Blip on your Spawned Wagon
@@ -27,7 +29,11 @@ Config.wagonBlipSprite = 'blip_mp_player_wagon' -- Default: 'blip_mp_player_wago
 
 -- Players Can Call Their Selected Wagon
 Config.callAllowed = true -- Default: true / Set to false to Access Wagon from Menu Only
-Config.callDistance = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
+Config.callDist = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
+-----------------------------------------------------
+
+-- Distance from Wagon to Allow Target Prompts
+Config.returnDist = 3 -- Default: 3
 -----------------------------------------------------
 
 -- Set Player in Wagon on Spawn from Menu
@@ -49,7 +55,8 @@ Config.currencyType = 2 -- Default: 2
 Config.blipOnClosed = true -- If true, will show colored blip when shop is closed
 -----------------------------------------------------
 
--- Inventory Limit per Wagon Model
+-- Distance from Wagon to Allow Inventory Access
+Config.invDist = 5 -- Default: 5
 Config.inventory = {
     -- Buggies
     buggy01 = { invLimit = 50 },

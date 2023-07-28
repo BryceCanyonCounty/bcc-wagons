@@ -1,10 +1,8 @@
 local VORPcore = {}
 -- Prompts
 local OpenShops
-local CloseShops
 local OpenReturn
-local OpenGroup = GetRandomIntInRange(0, 0xffffff)
-local ClosedGroup = GetRandomIntInRange(0, 0xffffff)
+local PromptGroup = GetRandomIntInRange(0, 0xffffff)
 -- Wagons
 local ShopName
 local ShopEntity
@@ -22,9 +20,7 @@ end)
 -- Start Wagons
 CreateThread(function()
     ShopOpen()
-    ShopClosed()
     ReturnOpen()
-
     while true do
         Wait(0)
         local player = PlayerPedId()
@@ -37,8 +33,10 @@ CreateThread(function()
                 if shopCfg.shopHours then
                     -- Using Shop Hours - Shop Closed
                     if hour >= shopCfg.shopClose or hour < shopCfg.shopOpen then
-                        if shopCfg.blipOn and Config.blipOnClosed and not Config.shops[shop].Blip then
-                            AddBlip(shop)
+                        if shopCfg.blipOn and Config.blipOnClosed then
+                            if not Config.shops[shop].Blip then
+                                AddBlip(shop)
+                            end
                             Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipClosed])) -- BlipAddModifier
                         else
                             if Config.shops[shop].Blip then
@@ -53,12 +51,10 @@ CreateThread(function()
                         local sDist = #(pCoords - shopCfg.npc)
                         if sDist <= shopCfg.sDistance then
                             sleep = false
-                            local shopClosed = CreateVarString(10, 'LITERAL_STRING', shopCfg.shopName .. _U('closed'))
-                            PromptSetActiveGroupThisFrame(ClosedGroup, shopClosed)
-
-                            if Citizen.InvokeNative(0xC92AC953F0A982AE, CloseShops) then -- UiPromptHasStandardModeCompleted
-                                VORPcore.NotifyRightTip(shopCfg.shopName .. _U('hours') .. shopCfg.shopOpen .. _U('to') .. shopCfg.shopClose .. _U('hundred'), 4000)
-                            end
+                            local shopClosed = CreateVarString(10, 'LITERAL_STRING', shopCfg.shopName .. _U('hours') .. shopCfg.shopOpen .. _U('to') .. shopCfg.shopClose .. _U('hundred'))
+                            PromptSetActiveGroupThisFrame(PromptGroup, shopClosed)
+                            PromptSetEnabled(OpenShops, 0)
+                            PromptSetEnabled(OpenReturn, 0)
                         end
                     elseif hour >= shopCfg.shopOpen then
                         -- Using Shop Hours - Shop Open
@@ -83,7 +79,9 @@ CreateThread(function()
                             if sDist <= shopCfg.sDistance then
                                 sleep = false
                                 local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                                PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
+                                PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
+                                PromptSetEnabled(OpenShops, 1)
+                                PromptSetEnabled(OpenReturn, 1)
 
                                 if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
                                     OpenMenu(shop)
@@ -112,9 +110,10 @@ CreateThread(function()
                             if sDist <= shopCfg.sDistance then
                                 sleep = false
                                 local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                                PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
+                                PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
+                                PromptSetEnabled(OpenShops, 1)
+                                PromptSetEnabled(OpenReturn, 1)
 
-                                local args = shop
                                 if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
                                     VORPcore.RpcCall('CheckPlayerJob', function(result)
                                         if result then
@@ -122,7 +121,7 @@ CreateThread(function()
                                         else
                                             return
                                         end
-                                    end, args)
+                                    end, shop)
                                 elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
                                     VORPcore.RpcCall('CheckPlayerJob', function(result)
                                         if result then
@@ -130,7 +129,7 @@ CreateThread(function()
                                         else
                                             return
                                         end
-                                    end, args)
+                                    end, shop)
                                 end
                             end
                         end
@@ -158,7 +157,9 @@ CreateThread(function()
                         if sDist <= shopCfg.sDistance then
                             sleep = false
                             local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                            PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
+                            PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
+                            PromptSetEnabled(OpenShops, 1)
+                            PromptSetEnabled(OpenReturn, 1)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
                                 OpenMenu(shop)
@@ -187,9 +188,10 @@ CreateThread(function()
                         if sDist <= shopCfg.sDistance then
                             sleep = false
                             local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                            PromptSetActiveGroupThisFrame(OpenGroup, shopOpen)
+                            PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
+                            PromptSetEnabled(OpenShops, 1)
+                            PromptSetEnabled(OpenReturn, 1)
 
-                            local args = shop
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
                                 VORPcore.RpcCall('CheckPlayerJob', function(result)
                                     if result then
@@ -197,7 +199,7 @@ CreateThread(function()
                                     else
                                         return
                                     end
-                                end, args)
+                                end, shop)
                             elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
                                 VORPcore.RpcCall('CheckPlayerJob', function(result)
                                     if result then
@@ -205,7 +207,7 @@ CreateThread(function()
                                     else
                                         return
                                     end
-                                end, args)
+                                end, shop)
                             end
                         end
                     end
@@ -664,24 +666,10 @@ function ShopOpen()
     PromptSetControlAction(OpenShops, Config.keys.shop)
     str = CreateVarString(10, 'LITERAL_STRING', str)
     PromptSetText(OpenShops, str)
-    PromptSetEnabled(OpenShops, 1)
     PromptSetVisible(OpenShops, 1)
     PromptSetStandardMode(OpenShops, 1)
-    PromptSetGroup(OpenShops, OpenGroup)
+    PromptSetGroup(OpenShops, PromptGroup)
     PromptRegisterEnd(OpenShops)
-end
-
-function ShopClosed()
-    local str = _U('shopPrompt')
-    CloseShops = PromptRegisterBegin()
-    PromptSetControlAction(CloseShops, Config.keys.shop)
-    str = CreateVarString(10, 'LITERAL_STRING', str)
-    PromptSetText(CloseShops, str)
-    PromptSetEnabled(CloseShops, 1)
-    PromptSetVisible(CloseShops, 1)
-    PromptSetStandardMode(CloseShops, 1)
-    PromptSetGroup(CloseShops, ClosedGroup)
-    PromptRegisterEnd(CloseShops)
 end
 
 function ReturnOpen()
@@ -690,10 +678,9 @@ function ReturnOpen()
     PromptSetControlAction(OpenReturn, Config.keys.ret)
     str = CreateVarString(10, 'LITERAL_STRING', str)
     PromptSetText(OpenReturn, str)
-    PromptSetEnabled(OpenReturn, 1)
     PromptSetVisible(OpenReturn, 1)
     PromptSetStandardMode(OpenReturn, 1)
-    PromptSetGroup(OpenReturn, OpenGroup)
+    PromptSetGroup(OpenReturn, PromptGroup)
     PromptRegisterEnd(OpenReturn)
 end
 

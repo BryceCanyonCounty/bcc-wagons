@@ -13,7 +13,6 @@ Locales["en_lang"] = {
     noWagonReturn = "You don't have a wagon to return",
     noOwnedWagons = "You don't own any wagons",
     needJob = "You don't have the required job!",
-    needJobGrade = "You don't have the required job grade!",
     wagonLimit = "You can have a maximum of ~o~",
     wagons = "~q~ wagons!",
     soldWagon = "You sold ~o~",

@@ -9,6 +9,7 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Buy and sell wagons through the wagon shops
 - Cash and/or gold may be used for payments in the menu
 - Individual inventory for owned wagons
+- Call your selected wagon using the `J` key
 - Shop hours may be set individually for each shop or disabled to allow the shop to remain open
 - Shop blips are colored and changeable per shop location
 - Blips can change color reflecting if shop is open, closed or job locked
@@ -16,7 +17,7 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Wagons can be returned at any shop location via prompt
 - Give your wagon a special name at purchase time (rename wagon using the menu)
 - Set a max number of wagons per player in the config
-- Call your selected wagon using the `J` key
+
 - Distance-based NPC spawns
 
 #### Commands
@@ -38,7 +39,6 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 
 #### Credits
 - lrp_stable
-- vorp_stores
 - [ByteSizd](https://github.com/AndrewR3K) - Vue Boilerplate for RedM
 - [SavSin](https://github.com/DavFount) - UI conversion to VueJS
 

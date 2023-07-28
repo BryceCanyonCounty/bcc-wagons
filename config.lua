@@ -32,7 +32,7 @@ Config.callAllowed = true -- Default: true / Set to false to Access Wagon from M
 Config.callDist = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
 -----------------------------------------------------
 
--- Distance from Wagon to Allow Target Prompts
+-- Distance from Wagon to Allow Target Prompts(right-click)
 Config.returnDist = 3 -- Default: 3
 -----------------------------------------------------
 

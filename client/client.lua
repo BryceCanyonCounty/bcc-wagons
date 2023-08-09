@@ -605,7 +605,7 @@ function CreateCamera()
     local wagonCam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
     SetCamCoord(wagonCam, shopCfg.wagonCam.x, shopCfg.wagonCam.y, shopCfg.wagonCam.z + 2.0)
     SetCamActive(wagonCam, true)
-    PointCamAtCoord(wagonCam, shopCfg.spawn.x, shopCfg.spawn.y, shopCfg.spawn.z)
+    PointCamAtCoord(wagonCam, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z)
     DoScreenFadeOut(500)
     Wait(500)
     DoScreenFadeIn(500)
@@ -617,7 +617,7 @@ function CameraLighting()
     local shopCfg = Config.shops[Shop]
     while Cam do
         Wait(0)
-        Citizen.InvokeNative(0xD2D9E04C0DF927F4, shopCfg.spawn.x, shopCfg.spawn.y, shopCfg.spawn.z + 3, 130, 130, 85, 4.0, 15.0) -- DrawLightWithRange
+        Citizen.InvokeNative(0xD2D9E04C0DF927F4, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z + 3, 130, 130, 85, 4.0, 15.0) -- DrawLightWithRange
     end
 end
 

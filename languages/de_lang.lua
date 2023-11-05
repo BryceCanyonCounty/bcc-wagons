@@ -11,6 +11,7 @@ Locales["de_lang"] = {
     wagonReturned = "Wagon wurde zurückgeschickt!",
     noWagonReturn = "Du hast keine Kutsche",
     noOwnedWagons = "Du besitzt keine Kutschen",
+    noSelectedWagon = "You need to select a wagon!",
     needJob = "Sie haben nicht den erforderlichen Job!",
     wagonLimit = "Du kannst maximal ~o~",
     wagons = "~q~ Kutschen besitzen!",
@@ -19,5 +20,6 @@ Locales["de_lang"] = {
     nameWagon = "Benenne deine Kutsche:",
     wagonInv = "Kutschenlager",
     tooClose = "Hier kannst du deine Kutsche nicht rufen",
-    noWagon = "Du hast keinen Wagen draußen"
+    noWagon = "Du hast keinen Wagen draußen",
+    noReturn = "Wagon must be returned at a wagon dealer!"
 }

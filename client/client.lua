@@ -1,4 +1,8 @@
 local VORPcore = {}
+TriggerEvent('getCore', function(core)
+    VORPcore = core
+end)
+local ClientRPC = exports.vorp_core:ClientRpcCall()
 -- Prompts
 local OpenShops
 local OpenReturn
@@ -9,25 +13,21 @@ local ShopEntity
 local MyEntity
 local MyWagon = nil
 local MyWagonId
+local MyWagonName
 local Shop
 local InMenu = false
 local Cam = false
-
-TriggerEvent('getCore', function(core)
-    VORPcore = core
-end)
-
+local HasJob = nil
 -- Start Wagons
 CreateThread(function()
     StartPrompts()
     while true do
         Wait(0)
-        local player = PlayerPedId()
-        local pCoords = GetEntityCoords(player)
+        local playerPed = PlayerPedId()
+        local pCoords = GetEntityCoords(playerPed)
         local sleep = true
         local hour = GetClockHours()
-
-        if not InMenu and not IsEntityDead(player) then
+        if not InMenu and not IsEntityDead(playerPed) then
             for shop, shopCfg in pairs(Config.shops) do
                 if shopCfg.shopHours then
                     -- Using Shop Hours - Shop Closed
@@ -114,21 +114,19 @@ CreateThread(function()
                                 PromptSetEnabled(OpenReturn, 1)
 
                                 if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                    VORPcore.RpcCall('CheckPlayerJob', function(result)
-                                        if result then
-                                            OpenMenu(shop)
-                                        else
-                                            return
-                                        end
-                                    end, shop)
+                                    local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
+                                    if result then
+                                        OpenMenu(shop)
+                                    else
+                                        return
+                                    end
                                 elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                    VORPcore.RpcCall('CheckPlayerJob', function(result)
-                                        if result then
-                                            ReturnWagon()
-                                        else
-                                            return
-                                        end
-                                    end, shop)
+                                    local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
+                                    if result then
+                                        ReturnWagon()
+                                    else
+                                        return
+                                    end
                                 end
                             end
                         end
@@ -192,21 +190,19 @@ CreateThread(function()
                             PromptSetEnabled(OpenReturn, 1)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                VORPcore.RpcCall('CheckPlayerJob', function(result)
-                                    if result then
-                                        OpenMenu(shop)
-                                    else
-                                        return
-                                    end
-                                end, shop)
+                                local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
+                                if result then
+                                    OpenMenu(shop)
+                                else
+                                    return
+                                end
                             elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                VORPcore.RpcCall('CheckPlayerJob', function(result)
-                                    if result then
-                                        ReturnWagon()
-                                    else
-                                        return
-                                    end
-                                end, shop)
+                                local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
+                                if result then
+                                    ReturnWagon()
+                                else
+                                    return
+                                end
                             end
                         end
                     end
@@ -267,7 +263,7 @@ RegisterNUICallback('LoadWagon', function(data, cb)
     end
 
     local shopCfg = Config.shops[Shop]
-    ShopEntity = CreateVehicle(model, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z, shopCfg.spawnHeading, false, false, false, false)
+    ShopEntity = CreateVehicle(model, shopCfg.spawnPos, shopCfg.spawnHeading, false, false, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, ShopEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, ShopEntity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
@@ -280,10 +276,15 @@ end)
 -- Buy and Name New Wagons
 RegisterNUICallback('BuyWagon', function(data, cb)
     cb('ok')
-    TriggerServerEvent('bcc-wagons:BuyWagon', data)
+    local canBuy = ClientRPC.Callback.TriggerAwait('bcc-wagons:BuyWagon', data)
+    if canBuy then
+        SetWagonName(data, false)
+    else
+        WagonMenu()
+    end
 end)
 
-RegisterNetEvent('bcc-wagons:SetWagonName', function(data, rename)
+function SetWagonName(data, rename)
     SendNUIMessage({
         action = 'hide'
     })
@@ -300,15 +301,22 @@ RegisterNetEvent('bcc-wagons:SetWagonName', function(data, rename)
         if GetOnscreenKeyboardResult() then
             local wagonName = GetOnscreenKeyboardResult()
             if string.len(wagonName) > 0 then
-                if not rename then
-                    TriggerServerEvent('bcc-wagons:SaveNewWagon', data, wagonName)
+                local wagonInfo = {wagonData = data, name = wagonName}
+                if rename then
+                    local nameSaved = ClientRPC.Callback.TriggerAwait('bcc-wagons:UpdateWagonName', wagonInfo)
+                    if nameSaved then
+                        WagonMenu()
+                    end
                     return
                 else
-                    TriggerServerEvent('bcc-wagons:UpdateWagonName', data, wagonName)
+                    local wagonSaved = ClientRPC.Callback.TriggerAwait('bcc-wagons:SaveNewWagon', wagonInfo)
+                    if wagonSaved then
+                        WagonMenu()
+                    end
                     return
                 end
             else
-                TriggerEvent('bcc-wagons:SetWagonName', data, rename)
+                SetWagonName(data, rename)
                 return
             end
         end
@@ -321,12 +329,12 @@ RegisterNetEvent('bcc-wagons:SetWagonName', function(data, rename)
         SetNuiFocus(true, true)
         TriggerServerEvent('bcc-wagons:GetMyWagons')
     end)
-end)
+end
 
 -- Rename Owned Wagon
 RegisterNUICallback('RenameWagon', function(data, cb)
     cb('ok')
-    TriggerEvent('bcc-wagons:SetWagonName', data, true)
+    SetWagonName(data, true)
 end)
 
 -- View Player Owned Wagons
@@ -346,7 +354,7 @@ RegisterNUICallback('LoadMyWagon', function(data, cb)
     end
 
     local shopCfg = Config.shops[Shop]
-    MyEntity = CreateVehicle(model, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z, shopCfg.spawnHeading, false, false, false, false)
+    MyEntity = CreateVehicle(model, shopCfg.spawnPos, shopCfg.spawnHeading, false, false, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, MyEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyEntity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
@@ -362,24 +370,33 @@ RegisterNUICallback('SelectWagon', function(data, cb)
     TriggerServerEvent('bcc-wagons:SelectWagon', data)
 end)
 
+function GetSelectedWagon()
+    local data = ClientRPC.Callback.TriggerAwait('bcc-wagons:GetWagonData')
+    if data then
+        MyWagonId = data.invDist
+        SpawnWagon(data.model, data.name, false, data.id)
+    end
+end
+
 -- Spawn Player Owned Wagons
 RegisterNUICallback('SpawnInfo', function(data, cb)
     cb('ok')
-    TriggerEvent('bcc-wagons:SpawnWagon', data.WagonModel, data.WagonName, true, data.WagonId)
+    SpawnWagon(data.WagonModel, data.WagonName, true, data.WagonId)
 end)
 
-RegisterNetEvent('bcc-wagons:SpawnWagon', function(wagonModel, name, menuSpawn, id)
+function SpawnWagon(wagonModel, name, menuSpawn, id)
     if MyWagon then
         DeleteEntity(MyWagon)
         MyWagon = nil
     end
 
+    MyWagonName = name
     local model = joaat(wagonModel)
     LoadWagonModel(model)
 
     if menuSpawn then
         local shopCfg = Config.shops[Shop]
-        MyWagon = CreateVehicle(model, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z, shopCfg.spawnHeading, true, false, false, false)
+        MyWagon = CreateVehicle(model, shopCfg.spawnPos, shopCfg.spawnHeading, true, false, false, false)
         Citizen.InvokeNative(0x7263332501E07F52, MyWagon, true) -- SetVehicleOnGroundProperly
         SetModelAsNoLongerNeeded(model)
         if Config.seated then
@@ -391,19 +408,19 @@ RegisterNetEvent('bcc-wagons:SpawnWagon', function(wagonModel, name, menuSpawn, 
         end
     else
         local pCoords = GetEntityCoords(PlayerPedId())
-        local _, nodePosition, heading = GetClosestVehicleNodeWithHeading(pCoords.x, pCoords.y, pCoords.z, 1, 3.0, 0)
+        local _, node, heading = GetClosestVehicleNodeWithHeading(pCoords.x, pCoords.y, pCoords.z, 1, 3.0, 0)
         local index = 0
         while index <= 25 do
-            local _bool, _nodePosition, _heading = GetNthClosestVehicleNodeWithHeading(pCoords.x, pCoords.y, pCoords.z, index, 9, 3.0, 2.5)
-            if _bool  then
-                nodePosition = _nodePosition
+            local nodeCheck, _node, _heading = GetNthClosestVehicleNodeWithHeading(pCoords.x, pCoords.y, pCoords.z, index, 9, 3.0, 2.5)
+            if nodeCheck  then
+                node = _node
                 heading = _heading
-                index = index + 3
-            else
                 break
+            else
+                index = index + 3
             end
         end
-        MyWagon = CreateVehicle(model, nodePosition.x, nodePosition.y, nodePosition.z, heading, true, false, false, false)
+        MyWagon = CreateVehicle(model, node, heading, true, false, false, false)
         Citizen.InvokeNative(0x7263332501E07F52, MyWagon, true) -- SetVehicleOnGroundProperly
         SetModelAsNoLongerNeeded(model)
     end
@@ -412,41 +429,43 @@ RegisterNetEvent('bcc-wagons:SpawnWagon', function(wagonModel, name, menuSpawn, 
     TriggerServerEvent('bcc-wagons:RegisterInventory', MyWagonId, wagonModel)
 
     if Config.wagonTag then
-        TriggerEvent('bcc-wagons:WagonTag', name)
+        TriggerEvent('bcc-wagons:WagonTag')
     end
     if Config.wagonBlip then
-        TriggerEvent('bcc-wagons:WagonBlip', name)
+        TriggerEvent('bcc-wagons:WagonBlip')
     end
-    TriggerEvent('bcc-wagons:WagonTarget')
+    if Config.returnEnabled then
+        TriggerEvent('bcc-wagons:WagonTarget')
+    end
     TriggerEvent('bcc-wagons:WagonActions')
-end)
+end
 
 -- Set Wagon Name Above Wagon
-AddEventHandler('bcc-wagons:WagonTag', function(name)
-    local player = PlayerPedId()
-    local wagonTagDist = Config.wagonTagDist
-    local wagonTag = Citizen.InvokeNative(0xE961BF23EAB76B12, MyWagon, name) -- CreateMpGamerTagOnEntity
-    Citizen.InvokeNative(0xA0D7CE5F83259663, wagonTag) -- SetMpGamerTagBigText
+AddEventHandler('bcc-wagons:WagonTag', function()
+    local playerPed = PlayerPedId()
+    local tagDist = Config.tagDistance
+    local gamerTagId = Citizen.InvokeNative(0xE961BF23EAB76B12, MyWagon, MyWagonName) -- CreateMpGamerTagOnEntity
     while MyWagon do
         Wait(1000)
-        local dist = #(GetEntityCoords(player) - GetEntityCoords(MyWagon))
-        if dist < wagonTagDist and not Citizen.InvokeNative(0xEC5F66E459AF3BB2, player, MyWagon) then -- IsPedOnSpecificVehicle
-            Citizen.InvokeNative(0x93171DDDAB274EB8, wagonTag, 2) -- SetMpGamerTagVisibility
+        local dist = #(GetEntityCoords(playerPed) - GetEntityCoords(MyWagon))
+        if dist <= tagDist and not Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
+            Citizen.InvokeNative(0x93171DDDAB274EB8, gamerTagId, 3) -- SetMpGamerTagVisibility
         else
-            if Citizen.InvokeNative(0x502E1591A504F843, wagonTag, MyWagon) then -- IsMpGamerTagActiveOnEntity
-                Citizen.InvokeNative(0x93171DDDAB274EB8, wagonTag, 0) -- SetMpGamerTagVisibility
+            if Citizen.InvokeNative(0x502E1591A504F843, gamerTagId, MyWagon) then -- IsMpGamerTagActiveOnEntity
+                Citizen.InvokeNative(0x93171DDDAB274EB8, gamerTagId, 0) -- SetMpGamerTagVisibility
             end
         end
     end
+    Citizen.InvokeNative(0x839BFD7D7E49FE09, Citizen.PointerValueIntInitialized(gamerTagId)) -- RemoveMpGamerTag
 end)
 
 -- Set Blip on Spawned Wagon when Empty
-AddEventHandler('bcc-wagons:WagonBlip', function(name)
-    local player = PlayerPedId()
+AddEventHandler('bcc-wagons:WagonBlip', function()
+    local playerPed = PlayerPedId()
     local wagonBlip
     while MyWagon do
         Wait(1000)
-        if Citizen.InvokeNative(0xEC5F66E459AF3BB2, player, MyWagon) then -- IsPedOnSpecificVehicle
+        if Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
             if wagonBlip then
                 RemoveBlip(wagonBlip)
                 wagonBlip = nil
@@ -455,7 +474,7 @@ AddEventHandler('bcc-wagons:WagonBlip', function(name)
             if not wagonBlip then
                 wagonBlip = Citizen.InvokeNative(0x23F74C2FDA6E7C61, -1749618580, MyWagon) -- BlipAddForEntity
                 SetBlipSprite(wagonBlip, joaat(Config.wagonBlipSprite), true)
-                Citizen.InvokeNative(0x9CB1A1623062F402, wagonBlip, name) -- SetBlipNameFromPlayerString
+                Citizen.InvokeNative(0x9CB1A1623062F402, wagonBlip, MyWagonName) -- SetBlipNameFromPlayerString
             end
         end
     end
@@ -466,7 +485,10 @@ RegisterNUICallback('SellWagon', function(data, cb)
     cb('ok')
     DeleteEntity(MyEntity)
     Cam = false
-    TriggerServerEvent('bcc-wagons:SellWagon', data, Shop)
+    local wagonSold = ClientRPC.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data, Shop)
+    if wagonSold then
+        WagonMenu()
+    end
 end)
 
 -- Close Main Menu
@@ -495,7 +517,7 @@ RegisterNUICallback('CloseMenu', function(data, cb)
 end)
 
 -- Reopen Menu After Sell or Failed Purchase
-RegisterNetEvent('bcc-wagons:WagonMenu', function()
+function WagonMenu()
     if ShopEntity then
         DeleteEntity(ShopEntity)
         ShopEntity = nil
@@ -509,11 +531,11 @@ RegisterNetEvent('bcc-wagons:WagonMenu', function()
     })
     SetNuiFocus(true, true)
     TriggerServerEvent('bcc-wagons:GetMyWagons')
-end)
+end
 
 -- Call Selected Wagon
 CreateThread(function()
-    if Config.callAllowed then
+    if Config.callEnabled then
         local callKey = Config.keys.call
         while true do
             Wait(0)
@@ -521,12 +543,12 @@ CreateThread(function()
                 if MyWagon then
                     local dist = #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(MyWagon))
                     if dist >= Config.callDist then
-                        TriggerServerEvent('bcc-wagons:GetSelectedWagon')
+                        GetSelectedWagon()
                     else
                         VORPcore.NotifyRightTip(_U('tooClose'), 5000)
                     end
                 else
-                    TriggerServerEvent('bcc-wagons:GetSelectedWagon')
+                    GetSelectedWagon()
                 end
             end
         end
@@ -551,6 +573,7 @@ end)
 -- Return Wagon Using Prompt at Shop Location
 function ReturnWagon()
     if MyWagon then
+        TriggerServerEvent('bcc-wagons:DeregisterInventory', MyWagonId)
         DeleteEntity(MyWagon)
         MyWagon = nil
         VORPcore.NotifyRightTip(_U('wagonReturned'), 4000)
@@ -561,21 +584,22 @@ end
 
 -- Target Menu Wagon Return
 AddEventHandler('bcc-wagons:WagonTarget', function()
-    local player = PlayerPedId()
-    local id = PlayerId()
+    local playerPed = PlayerPedId()
+    local player = PlayerId()
     local returnDist = Config.returnDist
     while MyWagon do
         local sleep = 1000
-        local dist = #(GetEntityCoords(player) - GetEntityCoords(MyWagon))
+        local dist = #(GetEntityCoords(playerPed) - GetEntityCoords(MyWagon))
         if dist <= returnDist then
             Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, true) -- SetVehicleCanBeTargetted
-            if not Citizen.InvokeNative(0xEC5F66E459AF3BB2, player, MyWagon) then -- IsPedOnSpecificVehicle
-                local _, targetEntity = GetPlayerTargetEntity(id)
-                if Citizen.InvokeNative(0x27F89FDC16688A7A, id, MyWagon, 0) then -- IsPlayerTargettingEntity
+            if not Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
+                local _, targetEntity = GetPlayerTargetEntity(player)
+                if Citizen.InvokeNative(0x27F89FDC16688A7A, player, MyWagon, 0) then -- IsPlayerTargettingEntity
                     sleep = 0
                     local wagonGroup = Citizen.InvokeNative(0xB796970BD125FCE8, targetEntity) -- PromptGetGroupIdForTargetEntity
                     TriggerEvent('bcc-wagons:TargetReturn', wagonGroup)
                     if Citizen.InvokeNative(0x580417101DDB492F, 2, Config.keys.targetRet) then -- IsControlJustPressed
+                        TriggerServerEvent('bcc-wagons:DeregisterInventory', MyWagonId)
                         DoScreenFadeOut(100)
                         Wait(100)
                         DeleteEntity(MyWagon)
@@ -642,7 +666,7 @@ function Rotation(dir)
     end
 end
 
-RegisterCommand('wagonEnter', function(rawCommand)
+RegisterCommand('wagonEnter', function()
     if MyWagon then
         DoScreenFadeOut(500)
         Wait(500)
@@ -650,13 +674,17 @@ RegisterCommand('wagonEnter', function(rawCommand)
         Wait(500)
         DoScreenFadeIn(500)
     else
-        VORPcore.NotifyRightTip(_U('noWagon'), 5000)
+        VORPcore.NotifyRightTip(_U('noWagon'), 4000)
     end
 end, false)
 
-RegisterCommand('wagonReturn', function(rawCommand)
-    ReturnWagon()
-end, false)
+RegisterCommand('wagonReturn', function()
+    if Config.returnEnabled then
+        ReturnWagon()
+    else
+        VORPcore.NotifyRightTip(_U('noReturn'), 4000)
+    end
+end)
 
 -- Menu Prompts
 function StartPrompts()
@@ -735,6 +763,10 @@ AddEventHandler('onResourceStop', function(resourceName)
     DestroyAllCams(true)
     DisplayRadar(true)
 
+    if ShopEntity then
+        DeleteEntity(ShopEntity)
+        ShopEntity = nil
+    end
     if MyWagon then
         DeleteEntity(MyWagon)
         MyWagon = nil

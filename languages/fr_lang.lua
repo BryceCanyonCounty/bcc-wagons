@@ -12,6 +12,7 @@ Locales["fr_lang"] = {
     wagonReturned = "Le chariot a été renvoyé !",
     noWagonReturn = "Vous n'avez pas de chariot à renvoyer",
     noOwnedWagons = "Vous ne possédez pas de chariot",
+    noSelectedWagon = "You need to select a wagon!",
     needJob = "Vous n'avez pas l'emploi requis !",
     wagonLimit = "Vous pouvez avoir au maximum ~o~",
     wagons = "~q~ chariots !",
@@ -20,5 +21,6 @@ Locales["fr_lang"] = {
     nameWagon = "Nom de votre chariot :",
     wagonInv = "Coffre de stockage",
     tooClose = "Vous êtes trop près de votre chariot pour l'appeler",
-    noWagon = "Vous n'avez pas de chariot"
+    noWagon = "Vous n'avez pas de chariot",
+    noReturn = "Wagon must be returned at a wagon dealer!"
 }

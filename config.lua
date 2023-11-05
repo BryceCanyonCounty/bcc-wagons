@@ -19,7 +19,7 @@ Config.maxWagons = 5 -- Default: 5
 
 -- Places Wagon Name Above Wagon When Wagon is Empty
 Config.wagonTag = true --Default: true / Set to false to disable
-Config.wagonTagDist = 15 -- Default: 15 / Distance from Wagon to Show Tag
+Config.tagDistance = 15 -- Default: 15 / Distance from Wagon to Show Tag
 -----------------------------------------------------
 
 -- Set a Blip on your Spawned Wagon
@@ -27,8 +27,9 @@ Config.wagonBlip = true --Default: true / Set to false to disable
 Config.wagonBlipSprite = 'blip_mp_player_wagon' -- Default: 'blip_mp_player_wagon'
 -----------------------------------------------------
 
--- Players Can Call Their Selected Wagon
-Config.callAllowed = true -- Default: true / Set to false to Access Wagon from Menu Only
+-- Players Can Remote Call and Return Their Wagon
+Config.callEnabled = true -- Default: true / Set to false to Spawn Wagon from Menu Only
+Config.returnEnabled = true -- Defauly: true / Set to false to Return at Wagon Dealer Only
 Config.callDist = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
 -----------------------------------------------------
 
@@ -59,33 +60,33 @@ Config.blipOnClosed = true -- If true, will show colored blip when shop is close
 Config.invDist = 3 -- Default: 3
 Config.inventory = {
     -- Buggies
-    buggy01 = { invLimit = 50 },
-    buggy02 = { invLimit = 50 },
-    buggy03 = { invLimit = 50 },
-    cart02  = { invLimit = 50 },
+    buggy01 = { slots = 50 },
+    buggy02 = { slots = 50 },
+    buggy03 = { slots = 50 },
+    cart02  = { slots = 50 },
     -- Coaches
-    coach3 = { invLimit = 100 },
-    coach4 = { invLimit = 100 },
-    coach5 = { invLimit = 100 },
-    coach6 = { invLimit = 100 },
+    coach3 = { slots = 100 },
+    coach4 = { slots = 100 },
+    coach5 = { slots = 100 },
+    coach6 = { slots = 100 },
     -- Carts
-    cart01       = { invLimit = 200 },
-    cart03       = { invLimit = 200 },
-    cart04       = { invLimit = 200 },
-    cart06       = { invLimit = 200 },
-    cart07       = { invLimit = 200 },
-    cart08       = { invLimit = 200 },
-    huntercart01 = { invLimit = 200 },
+    cart01       = { slots = 200 },
+    cart03       = { slots = 200 },
+    cart04       = { slots = 200 },
+    cart06       = { slots = 200 },
+    cart07       = { slots = 200 },
+    cart08       = { slots = 200 },
+    huntercart01 = { slots = 200 },
     -- Wagons
-    supplywagon       = { invLimit = 400 },
-    wagontraveller01x = { invLimit = 400 },
-    wagon03x          = { invLimit = 400 },
-    wagon05x          = { invLimit = 400 },
-    wagon02x          = { invLimit = 400 },
-    wagon04x          = { invLimit = 400 },
-    wagon06x          = { invLimit = 400 },
-    chuckwagon000x    = { invLimit = 400 },
-    chuckwagon002x    = { invLimit = 400 },
+    supplywagon       = { slots = 400 },
+    wagontraveller01x = { slots = 400 },
+    wagon03x          = { slots = 400 },
+    wagon05x          = { slots = 400 },
+    wagon02x          = { slots = 400 },
+    wagon04x          = { slots = 400 },
+    wagon06x          = { slots = 400 },
+    chuckwagon000x    = { slots = 400 },
+    chuckwagon002x    = { slots = 400 },
 }
 -----------------------------------------------------
 

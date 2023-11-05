@@ -12,6 +12,7 @@ Locales["en_lang"] = {
     wagonReturned = "Wagon has been returned!",
     noWagonReturn = "You don't have a wagon to return",
     noOwnedWagons = "You don't own any wagons",
+    noSelectedWagon = "You need to select a wagon!",
     needJob = "You don't have the required job!",
     wagonLimit = "You can have a maximum of ~o~",
     wagons = "~q~ wagons!",
@@ -20,5 +21,6 @@ Locales["en_lang"] = {
     nameWagon = "Name your wagon:",
     wagonInv = "Storage Chest",
     tooClose = "You're too close to call your wagon",
-    noWagon = "You don't have a wagon out"
+    noWagon = "You don't have a wagon out",
+    noReturn = "Wagon must be returned at a wagon dealer!"
 }

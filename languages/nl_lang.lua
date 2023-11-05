@@ -12,6 +12,7 @@ Locales["nl_lang"] = {
     wagonReturned = "is ~o~ingeleverd",
     noWagonReturn = "Je hebt geen wagen om in te leveren!",
     noOwnedWagons = "Je hebt geen wagens die je beheert!",
+    noSelectedWagon = "You need to select a wagon!",
     needJob = "Je hebt hiervoor een baan nodig: ~o~",
     wagonLimit = "Je kan een maximale aantal hebben van ~o~",
     wagons = "~q~ wagens!",
@@ -20,5 +21,6 @@ Locales["nl_lang"] = {
     nameWagon = "Geef je wagen een naam:",
     wagonInv = "Wagen Inventory",
     tooClose = "Je bent te dichtbij om je wagen te roepen!",
-    noWagon = "Je hebt geen wagen buiten staan!"
+    noWagon = "Je hebt geen wagen buiten staan!",
+    noReturn = "Wagon must be returned at a wagon dealer!"
 }

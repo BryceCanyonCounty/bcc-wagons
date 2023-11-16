@@ -172,10 +172,6 @@ RegisterServerEvent('bcc-wagons:OpenInventory', function(id)
     exports.vorp_inventory:openInventory(src, 'wagon_' .. tostring(id))
 end)
 
-RegisterServerEvent('bcc-wagons:DeregisterInventory', function(id)
-    exports.vorp_inventory:removeInventory('wagon_' .. tostring(id))
-end)
-
 -- Check if Player has Required Job
 ServerRPC.Callback.Register('bcc-wagons:CheckPlayerJob', function(source, cb, shop)
     local src = source

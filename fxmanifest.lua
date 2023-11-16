@@ -32,3 +32,5 @@ files {
     "ui/dist/img/*.*",
     "ui/dist/style.css"
 }
+
+version '1.0.1'

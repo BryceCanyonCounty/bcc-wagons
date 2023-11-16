@@ -573,7 +573,6 @@ end)
 -- Return Wagon Using Prompt at Shop Location
 function ReturnWagon()
     if MyWagon then
-        TriggerServerEvent('bcc-wagons:DeregisterInventory', MyWagonId)
         DeleteEntity(MyWagon)
         MyWagon = nil
         VORPcore.NotifyRightTip(_U('wagonReturned'), 4000)
@@ -599,7 +598,6 @@ AddEventHandler('bcc-wagons:WagonTarget', function()
                     local wagonGroup = Citizen.InvokeNative(0xB796970BD125FCE8, targetEntity) -- PromptGetGroupIdForTargetEntity
                     TriggerEvent('bcc-wagons:TargetReturn', wagonGroup)
                     if Citizen.InvokeNative(0x580417101DDB492F, 2, Config.keys.targetRet) then -- IsControlJustPressed
-                        TriggerServerEvent('bcc-wagons:DeregisterInventory', MyWagonId)
                         DoScreenFadeOut(100)
                         Wait(100)
                         DeleteEntity(MyWagon)

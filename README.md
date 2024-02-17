@@ -1,10 +1,10 @@
 # bcc-wagons
 
-#### Description
+## Description
 
 Whether you're a hardworking farmer tending to your crops, a family embarking on a scenic countryside picnic, or a successful businessman looking to make an impression, these wagons will revolutionize the way you travel.
 
-#### Features
+## Features
 
 - Buy and sell wagons through the wagon shops
 - Cash and/or gold may be used for payments in the menu
@@ -19,17 +19,20 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Give your wagon a special name at purchase time (rename wagon using the menu)
 - Set a max number of wagons per player in the config
 - Distance-based NPC spawns
+- Trade wagons with other players using target-menu
+- Wainwright job can sell wagons to players (more to come!)
 
-#### Commands
+
+## Commands
 - Command `/wagonEnter` if you have trouble getting to your wagon
 - Command `/wagonReturn` to return wagon when away from a shop (if enabled in config)
 
-#### Dependencies
+## Dependencies
 
 - [vorp_core](https://github.com/VORPCORE/vorp-core-lua)
 - [vorp_inventory](https://github.com/VORPCORE/vorp_inventory-lua)
 
-#### Installation
+## Installation
 
 - Ensure that the dependancies are added and started
 - Add `bcc-wagons` folder to your resources folder
@@ -37,10 +40,10 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Run the included database file `wagons.sql`
 - Restart Server
 
-#### Credits
+## Credits
 - lrp_stable
 - [ByteSizd](https://github.com/AndrewR3K) - Vue Boilerplate for RedM
 - [SavSin](https://github.com/DavFount) - UI conversion to VueJS
 
-#### GitHub
+## GitHub
 - https://github.com/BryceCanyonCounty/bcc-wagons

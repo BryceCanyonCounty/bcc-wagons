@@ -1,17 +1,14 @@
-local VORPcore = {}
-TriggerEvent('getCore', function(core)
-    VORPcore = core
-end)
-local ServerRPC = exports.vorp_core:ServerRpcCall()
+local VORPcore = exports.vorp_core:GetCore()
 
--- Buy New Wagons
-ServerRPC.Callback.Register('bcc-wagons:BuyWagon', function(source, cb, data)
+VORPcore.Callback.Register('bcc-wagons:BuyWagon', function(source, cb, data)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local charid = Character.charIdentifier
-    local maxWagons = Config.maxWagons
-
-    local wagons = MySQL.query.await('SELECT * FROM player_wagons WHERE charid = ?', { charid })
+    local maxWagons = Config.maxPlayerWagons
+    if data.isWainwright then
+        maxWagons = Config.maxWainwrightWagons
+    end
+    local wagons = MySQL.query.await('SELECT * FROM `player_wagons` WHERE `charid` = ?', { charid })
     if #wagons >= maxWagons then
         VORPcore.NotifyRightTip(src, _U('wagonLimit') .. maxWagons .. _U('wagons'), 4000)
         cb(false)
@@ -23,7 +20,6 @@ ServerRPC.Callback.Register('bcc-wagons:BuyWagon', function(source, cb, data)
         else
             VORPcore.NotifyRightTip(src, _U('shortCash'), 4000)
             cb(false)
-            return
         end
     else
         if Character.gold >= data.Gold then
@@ -31,19 +27,17 @@ ServerRPC.Callback.Register('bcc-wagons:BuyWagon', function(source, cb, data)
         else
             VORPcore.NotifyRightTip(src, _U('shortGold'), 4000)
             cb(false)
-            return
         end
     end
 end)
 
--- Save New Wagon Purchase to Database
-ServerRPC.Callback.Register('bcc-wagons:SaveNewWagon', function(source, cb, wagonInfo)
+VORPcore.Callback.Register('bcc-wagons:SaveNewWagon', function(source, cb, wagonInfo)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local identifier = Character.identifier
     local charid = Character.charIdentifier
 
-    MySQL.query.await('INSERT INTO player_wagons (identifier, charid, name, model) VALUES (?, ?, ?, ?)',
+    MySQL.query.await('INSERT INTO `player_wagons` (identifier, charid, name, model) VALUES (?, ?, ?, ?)',
         { identifier, charid, wagonInfo.name, wagonInfo.wagonData.ModelW })
     if wagonInfo.wagonData.IsCash then
         Character.removeCurrency(0, wagonInfo.wagonData.Cash)
@@ -53,13 +47,12 @@ ServerRPC.Callback.Register('bcc-wagons:SaveNewWagon', function(source, cb, wago
     cb(true)
 end)
 
--- Rename Owned Wagons
-ServerRPC.Callback.Register('bcc-wagons:UpdateWagonName', function(source, cb, wagonInfo)
+VORPcore.Callback.Register('bcc-wagons:UpdateWagonName', function(source, cb, wagonInfo)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local charid = Character.charIdentifier
 
-    MySQL.query.await('UPDATE player_wagons SET name = ? WHERE charid = ? AND id = ?', { wagonInfo.name, charid, wagonInfo.wagonData.WagonId })
+    MySQL.query.await('UPDATE `player_wagons` SET `name` = ? WHERE `charid` = ? AND `id` = ?', { wagonInfo.name, charid, wagonInfo.wagonData.WagonId })
     cb(true)
 end)
 
@@ -69,23 +62,22 @@ RegisterServerEvent('bcc-wagons:SelectWagon', function(data)
     local charid = Character.charIdentifier
     local id = tonumber(data.WagonId)
 
-    local wagon = MySQL.query.await('SELECT * FROM player_wagons WHERE charid = ?', { charid })
+    local wagon = MySQL.query.await('SELECT * FROM `player_wagons` WHERE `charid` = ?', { charid })
     for i = 1, #wagon do
-        MySQL.query.await('UPDATE player_wagons SET selected = ? WHERE charid = ? AND id = ?', { 0, charid, wagon[i].id })
+        MySQL.query.await('UPDATE `player_wagons` SET `selected` = ? WHERE `charid` = ? AND `id` = ?', { 0, charid, wagon[i].id })
         if wagon[i].id == id then
-            MySQL.query.await('UPDATE player_wagons SET selected = ? WHERE charid = ? AND id = ?', { 1, charid, id })
+            MySQL.query.await('UPDATE `player_wagons` SET `selected` = ? WHERE `charid` = ? AND `id` = ?', { 1, charid, id })
         end
     end
 end)
 
--- Get Selected Player Owned Wagon
-ServerRPC.Callback.Register('bcc-wagons:GetWagonData', function(source, cb)
+VORPcore.Callback.Register('bcc-wagons:GetWagonData', function(source, cb)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local charid = Character.charIdentifier
     local data = nil
 
-    local wagons = MySQL.query.await('SELECT * FROM player_wagons WHERE charid = ?', { charid })
+    local wagons = MySQL.query.await('SELECT * FROM `player_wagons` WHERE `charid` = ?', { charid })
     if #wagons ~= 0 then
         for i = 1, #wagons do
             if wagons[i].selected == 1 then
@@ -108,32 +100,30 @@ ServerRPC.Callback.Register('bcc-wagons:GetWagonData', function(source, cb)
     end
 end)
 
--- Get Player Owned Wagons
 RegisterNetEvent('bcc-wagons:GetMyWagons', function()
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local charid = Character.charIdentifier
 
-    local wagons = MySQL.query.await('SELECT * FROM player_wagons WHERE charid = ?', { charid })
+    local wagons = MySQL.query.await('SELECT * FROM `player_wagons` WHERE `charid` = ?', { charid })
     TriggerClientEvent('bcc-wagons:WagonsData', src, wagons)
 end)
 
--- Sell Player Owned Wagons
-ServerRPC.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data, shopId)
+VORPcore.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data, site)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local charid = Character.charIdentifier
     local modelWagon = nil
     local id = tonumber(data.WagonId)
 
-    local wagons = MySQL.query.await('SELECT * FROM player_wagons WHERE charid = ?', { charid })
+    local wagons = MySQL.query.await('SELECT * FROM `player_wagons` WHERE `charid` = ?', { charid })
     for i = 1, #wagons do
         if tonumber(wagons[i].id) == id then
             modelWagon = wagons[i].model
-            MySQL.query.await('DELETE FROM player_wagons WHERE charid = ? AND id = ?', { charid, id })
+            MySQL.query.await('DELETE FROM `player_wagons` WHERE `charid` = ? AND `id` = ?', { charid, id })
         end
     end
-    for _, wagonModels in pairs(Config.shops[shopId].wagons) do
+    for _, wagonModels in pairs(Config.shops[site].wagons) do
         for model, wagonConfig in pairs(wagonModels['types']) do
             if model == modelWagon then
                 local sellPrice = (Config.sellPrice * wagonConfig.cashPrice)
@@ -145,7 +135,39 @@ ServerRPC.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data,
     end
 end)
 
--- Register Wagon Inventory
+VORPcore.Callback.Register('bcc-wagons:SaveWagonTrade', function(source, cb, serverId, wagonId)
+    -- Current Owner
+    local src = source
+    local curOwner = VORPcore.getUser(src).getUsedCharacter
+    local curOwnerName = curOwner.firstname .. " " .. curOwner.lastname
+    -- New Owner
+    local newOwner = VORPcore.getUser(serverId).getUsedCharacter
+    local newOwnerId = newOwner.identifier
+    local newOwnerCharId = newOwner.charIdentifier
+    local newOwnerName = newOwner.firstname .. " " .. newOwner.lastname
+    local charJob = newOwner.job
+    local jobGrade = newOwner.jobGrade
+
+    local isWainwright = false
+    isWainwright = JobCheck(charJob, jobGrade, Config.wainwrightJob)
+    local maxWagons = Config.maxPlayerWagons
+    if isWainwright then
+        maxWagons = Config.maxWainwrightWagons
+    end
+    local wagons = MySQL.query.await('SELECT * FROM `player_wagons` WHERE `charid` = ?', { newOwnerCharId })
+    if #wagons >= maxWagons then
+        VORPcore.NotifyRightTip(src, _U('tradeFailed') .. newOwnerName .. _U('tooManyWagons'), 5000)
+        cb(false)
+        return
+    end
+
+    MySQL.query.await('UPDATE `player_wagons` SET `identifier` = ?, `charid` = ?, `selected` = ? WHERE `id` = ?', { newOwnerId, newOwnerCharId, 0, wagonId })
+
+    VORPcore.NotifyRightTip(src, _U('youGave') .. newOwnerName .. _U('aWagon'), 4000)
+    VORPcore.NotifyRightTip(serverId, curOwnerName .._U('gaveWagon'), 4000)
+    cb(true)
+end)
+
 RegisterServerEvent('bcc-wagons:RegisterInventory', function(id, wagonModel)
     for model, invConfig in pairs(Config.inventory) do
         if model == wagonModel then
@@ -166,29 +188,39 @@ RegisterServerEvent('bcc-wagons:RegisterInventory', function(id, wagonModel)
     end
 end)
 
--- Open Wagon Inventory
 RegisterServerEvent('bcc-wagons:OpenInventory', function(id)
     local src = source
     exports.vorp_inventory:openInventory(src, 'wagon_' .. tostring(id))
 end)
 
--- Check if Player has Required Job
-ServerRPC.Callback.Register('bcc-wagons:CheckPlayerJob', function(source, cb, shop)
+VORPcore.Callback.Register('bcc-wagons:CheckJob', function(source, cb, wainwright, site)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
-    local playerJob = Character.job
+    local charJob = Character.job
     local jobGrade = Character.jobGrade
+    if not charJob then
+        cb(false)
+        return
+    end
+    local jobConfig
+    if wainwright then
+        jobConfig = Config.wainwrightJob
+    else
+        jobConfig = Config.shops[site].shop.jobs
+    end
+    local hasJob = false
+    hasJob = JobCheck(charJob, jobGrade, jobConfig)
+    if hasJob then
+        cb(true)
+    else
+        cb(false)
+    end
+end)
 
-    if playerJob then
-        for _, job in pairs(Config.shops[shop].allowedJobs) do
-            if playerJob == job then
-                if tonumber(jobGrade) >= tonumber(Config.shops[shop].jobGrade) then
-                    cb(true)
-                    return
-                end
-            end
+function JobCheck(charJob, jobGrade, jobConfig)
+    for _, job in pairs(jobConfig) do
+        if (charJob == job.name) and (tonumber(jobGrade) >= tonumber(job.grade)) then
+            return true
         end
     end
-    VORPcore.NotifyRightTip(src, _U('needJob'), 4000)
-    cb(false)
-end)
+end

@@ -1,8 +1,10 @@
----------------------------------- ENGLISH -------------------------------------------
+---------------------------------- Dutch -------------------------------------------
 Locales["nl_lang"] = {
 
     shopPrompt = "Menu",
     returnPrompt = "Lever Wagen in",
+    targetTradePrompt = "Start Trade",
+    tradePrompt = "Trade Wagon",
     closed = " ~o~: ~e~SLUITEN",
     to = ":00~q~ to ~o~",
     hundred = ":00",
@@ -22,5 +24,12 @@ Locales["nl_lang"] = {
     wagonInv = "Wagen Inventory",
     tooClose = "Je bent te dichtbij om je wagen te roepen!",
     noWagon = "Je hebt geen wagen buiten staan!",
-    noReturn = "Wagon must be returned at a wagon dealer!"
+    noReturn = "Wagon must be returned at a wagon dealer!",
+    wainwrightBuyWagon = "Only Wainwrights can purchase wagons!",
+    youGave = "You gave ",
+    aWagon = " a wagon",
+    gaveWagon = " gave you a wagon",
+    tradeFailed = "Trade failed! ",
+    tooManyWagons = " has too many wagons",
+    readyToTrade = "Ready to trade wagon!",
 }

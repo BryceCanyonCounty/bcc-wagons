@@ -1,7 +1,10 @@
+---------------------------------- German -------------------------------------------
 Locales["de_lang"] = {
 
     shopPrompt = "Öffnen",
     returnPrompt = "Kutsche parken",
+    targetTradePrompt = "Start Trade",
+    tradePrompt = "Trade Wagon",
     closed = " ~o~: ~e~Geschlossen",
     to = ":00~q~ bis ~o~",
     hundred = ":00",
@@ -21,5 +24,12 @@ Locales["de_lang"] = {
     wagonInv = "Kutschenlager",
     tooClose = "Hier kannst du deine Kutsche nicht rufen",
     noWagon = "Du hast keinen Wagen draußen",
-    noReturn = "Wagon must be returned at a wagon dealer!"
+    noReturn = "Wagon must be returned at a wagon dealer!",
+    wainwrightBuyWagon = "Only Wainwrights can purchase wagons!",
+    youGave = "You gave ",
+    aWagon = " a wagon",
+    gaveWagon = " gave you a wagon",
+    tradeFailed = "Trade failed! ",
+    tooManyWagons = " has too many wagons",
+    readyToTrade = "Ready to trade wagon!",
 }

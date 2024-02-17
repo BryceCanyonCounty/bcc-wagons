@@ -3,6 +3,8 @@ Locales["en_lang"] = {
 
     shopPrompt = "Menu",
     returnPrompt = "Return Wagon",
+    targetTradePrompt = "Start Trade",
+    tradePrompt = "Trade Wagon",
     closed = " ~o~: ~e~CLOSED",
     to = ":00~q~ to ~o~",
     hundred = ":00",
@@ -22,5 +24,12 @@ Locales["en_lang"] = {
     wagonInv = "Storage Chest",
     tooClose = "You're too close to call your wagon",
     noWagon = "You don't have a wagon out",
-    noReturn = "Wagon must be returned at a wagon dealer!"
+    noReturn = "Wagon must be returned at a wagon dealer!",
+    wainwrightBuyWagon = "Only Wainwrights can purchase wagons!",
+    youGave = "You gave ",
+    aWagon = " a wagon",
+    gaveWagon = " gave you a wagon",
+    tradeFailed = "Trade failed! ",
+    tooManyWagons = " has too many wagons",
+    readyToTrade = "Ready to trade wagon!",
 }

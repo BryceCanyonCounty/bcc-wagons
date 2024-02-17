@@ -4,17 +4,44 @@ Config = {}
 Config.defaultlang = 'en_lang'
 -----------------------------------------------------
 
+-- Which currancy type is allowed?
+-- 0 = Cash Only
+-- 1 = Gold Only
+-- 2 = Both
+Config.currencyType = 2 -- Default: 2
+-----------------------------------------------------
+
 Config.keys = {
-    shop      = 0x760A9C6F, -- [G] Open Wagon Shop Menu
-    ret       = 0xD9D0E1C0, -- [spacebar] Return Wagon at Shop
-    call      = 0xF3830D8E, -- [J] Call Selected Wagon
-    inv       = 0xD8F73058, -- [U] Open Wagon Inventory
-    targetRet = 0x760A9C6F, -- [G] Target Menu Wagon Return
+    shop        = 0x760A9C6F, -- [G] Open Wagon Shop Menu
+    ret         = 0xD9D0E1C0, -- [spacebar] Return Wagon at Shop
+    call        = 0xF3830D8E, -- [J] Call Selected Wagon
+    inv         = 0xD8F73058, -- [U] Open Wagon Inventory
+    targetRet   = 0x760A9C6F, -- [G] Target Menu Wagon Return
+    targetTrade = 0x620A6C5E, -- [V] Target Menu Start Wagon Trade
+    trade       = 0x27D1C284, -- [R] Complete Wagon Trade
 }
 -----------------------------------------------------
 
--- Limit Number of Wagons per Player
-Config.maxWagons = 5 -- Default: 5
+-- Change / Translate Wagons Commands
+Config.commands = {
+    wagonEnter  = 'wagonEnter', -- Enter Wagon if Unable to Access
+    wagonReturn = 'wagonReturn' -- Return Wagon to Shop if 'returnEnabled' is true
+}
+-----------------------------------------------------
+
+-- Sell Price is 60% of cashPrice (shown below)
+Config.sellPrice = 0.60 -- Default: 0.60
+-----------------------------------------------------
+
+-- Max Number of Wagons per Player
+Config.maxPlayerWagons = 5      -- Default: 5
+Config.maxWainwrightWagons = 10 -- Default: 10
+-----------------------------------------------------
+
+-- Players Can Remote Call and Return Their Wagon
+Config.callEnabled = true -- Default: true / Set to false to Spawn Wagon from Menu Only
+Config.returnEnabled = true -- Defauly: true / Set to false to Return at Wagon Dealer Only
+Config.callDist = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
 -----------------------------------------------------
 
 -- Places Wagon Name Above Wagon When Wagon is Empty
@@ -27,33 +54,19 @@ Config.wagonBlip = true --Default: true / Set to false to disable
 Config.wagonBlipSprite = 'blip_mp_player_wagon' -- Default: 'blip_mp_player_wagon'
 -----------------------------------------------------
 
--- Players Can Remote Call and Return Their Wagon
-Config.callEnabled = true -- Default: true / Set to false to Spawn Wagon from Menu Only
-Config.returnEnabled = true -- Defauly: true / Set to false to Return at Wagon Dealer Only
-Config.callDist = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
------------------------------------------------------
-
 -- Distance from Wagon to Allow Target Prompts(right-click)
-Config.returnDist = 3 -- Default: 3
+Config.targetDist = 5 -- Default: 5
 -----------------------------------------------------
 
 -- Set Player in Wagon on Spawn from Menu
 Config.seated = true -- Default: true / Set to false to have Player Walk to Wagon
 -----------------------------------------------------
 
--- Sell Price is 60% of cashPrice (shown below)
-Config.sellPrice = 0.60 -- Default: 0.60
------------------------------------------------------
-
--- Which currancy type is allowed?
--- 0 = Cash Only
--- 1 = Gold Only
--- 2 = Both
-Config.currencyType = 2 -- Default: 2
------------------------------------------------------
-
--- Show or Remove Blip when Closed
-Config.blipOnClosed = true -- If true, will show colored blip when shop is closed
+-- Wainwright Job
+Config.wainwrightOnly = false -- *Not Currently Used*
+Config.wainwrightJob = {
+    { name = 'wainwright', grade = 0 },
+}
 -----------------------------------------------------
 
 -- Distance from Wagon to Allow Inventory Access
@@ -93,29 +106,46 @@ Config.inventory = {
 -- Wagon Shops
 Config.shops = {
     valentine = {
-        shopName = 'Valentine Wagons', -- Name of Shop on Menu
-        promptName = 'Valentine Wagons', -- Text Below the Prompt Button
-        blipOn = true, -- Turns Blips On / Off
-        blipName = 'Valentine Wagons', -- Name of the Blip on the Map
-        blipSprite = 1012165077, -- wagon wheel
-        blipOpen = 'WHITE', -- Shop Open - Default: White - Blip Colors Shown Below
-        blipClosed = 'RED', -- Shop Closed - Default: Red - Blip Colors Shown Below
-        blipJob = 'YELLOW_ORANGE', -- Shop Job Locked - Default: Yellow - Blip Colors Shown Below
-        npcOn = true, -- Turns NPCs On / Off
-        npcModel = 's_m_m_coachtaxidriver_01', -- Sets Model for NPCs
-        npcPos = vector3(-383.46, 792.91, 115.81), -- Location for NPC and Shop
-        npcHeading = 14.37, -- NPC Heading
-        spawnPos = vector3(-392.81, 800.65, 115.86), -- Wagon Spawn and Return Positions
-        spawnHeading = 266.14, -- Wagon Spawn Heading
-        wagonCam = vector3(-391.07, 794.49, 115.94), -- Camera Location to View Wagon When In-Menu
-        nDistance = 100.0, -- Distance from Shop for NPC to Spawn
-        sDistance = 2.0, -- Distance from NPC to Get Menu Prompt
-        allowedJobs = {}, -- Empty, Everyone Can Use / Insert Job to limit access - ex. 'police'
-        jobGrade = 0, -- Enter Minimum Rank / Job Grade to Access Shop
-        shopHours = false, -- If You Want the Shops to Use Open and Closed Hours
-        shopOpen = 7, -- Shop Open Time / 24 Hour Clock
-        shopClose = 21, -- Shop Close Time / 24 Hour Clock
-        wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% of cashPrice
+        shop = {
+            name        = 'Valentine Wagons',               -- Name of Shop on Menu
+            prompt      = 'Valentine Wagons',               -- Text Below the Prompt Button
+            distance    = 2.0,                              -- Distance from NPC to Get Menu Prompt
+            jobsEnabled = false,                            -- Allow Shop Access to Specified Jobs Only
+            jobs = {                                        -- Insert Job to limit access - ex. allowedJobs = {{name = 'police', grade = 1},{name = 'doctor', grade = 3}}
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,                             -- Shop uses Open and Closed Hours
+                open   = 7,                                 -- Shop Open Time / 24 Hour Clock
+                close  = 21                                 -- Shop Close Time / 24 Hour Clock
+            }
+        },
+        blip = {
+            show       = true,                              -- Show Blip On Map
+            showClosed = true,                              -- Show Blip On Map when Closed
+            name       = 'Valentine Wagons',                -- Name of Blip on Map
+            sprite     = 1012165077,                        -- Default: 1258184551
+            color = {
+                open   = 'WHITE',                           -- Shop Open - Default: White - Blip Colors Shown Below
+                closed = 'RED',                             -- Shop Closed - Deafault: Red - Blip Colors Shown Below
+                job    = 'YELLOW_ORANGE'                    -- Shop Job Locked - Default: Yellow - Blip Colors Shown Below
+            }
+        },
+        npc = {
+            active   = true,                                -- Turns NPC On / Off
+            model    = 's_m_m_coachtaxidriver_01',          -- Model Used for NPC
+            coords   = vector3(-383.46, 792.91, 115.81),    -- NPC and Shop Blip Positions
+            heading  = 14.37,                               -- NPC Heading
+            distance = 100.0                                -- Distance Between Player and Shop for NPC to Spawn
+        },
+        wagon = {
+            coords  = vector3(-392.81, 800.65, 115.86),     -- Wagon Spawn and Return Positions
+            heading = 266.14,                               -- Wagon Spawn Heading
+            camera  = vector3(-391.07, 794.49, 115.94)      -- Camera Location to View Wagon When In-Menu
+        },
+        wainwrightBuy = false,                              -- Only Wainwrights can Buy Wagons from this Shop
+        wagons = {                                          -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% of cashPrice
             {
                 name  = 'Buggies',
                 types = {
@@ -163,28 +193,45 @@ Config.shops = {
         }
     },
     strawberry = {
-        shopName = 'Strawberry Wagons',
-        promptName = 'Strawberry Wagons',
-        blipOn = true,
-        blipName = 'Strawberry Wagons',
-        blipSprite = 1012165077,
-        blipOpen = 'WHITE',
-        blipClosed = 'RED',
-        blipJob = 'YELLOW_ORANGE',
-        npcOn = true,
-        npcModel = 's_m_m_coachtaxidriver_01',
-        npcPos = vector3(-1831.53, -596.45, 154.48),
-        npcHeading = 277.22,
-        spawnPos = vector3(-1824.36, -601.47, 154.47),
-        spawnHeading = 180.8,
-        wagonCam = vector3(-1830.89, -604.33, 154.36),
-        nDistance = 100.0,
-        sDistance = 2.0,
-        allowedJobs = {},
-        jobGrade = 0,
-        shopHours = false,
-        shopOpen = 7,
-        shopClose = 21,
+        shop = {
+            name        = 'Strawberry Wagons',
+            prompt      = 'Strawberry Wagons',
+            distance    = 2.0,
+            jobsEnabled = false,
+            jobs = {
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,
+                open   = 7,
+                close  = 21
+            }
+        },
+        blip = {
+            show       = true,
+            showClosed = true,
+            name       = 'Strawberry Wagons',
+            sprite     = 1012165077,
+            color = {
+                open   = 'WHITE',
+                closed = 'RED',
+                job    = 'YELLOW_ORANGE'
+            }
+        },
+        npc = {
+            active   = true,
+            model    = 's_m_m_coachtaxidriver_01',
+            coords   = vector3(-1831.53, -596.45, 154.48),
+            heading  = 277.22,
+            distance = 100.0
+        },
+        wagon = {
+            coords  = vector3(-1824.36, -601.47, 154.47),
+            heading = 180.8,
+            camera  = vector3(-1830.89, -604.33, 154.36),
+        },
+        wainwrightBuy = false,
         wagons = {
             {
                 name  = 'Buggies',
@@ -233,29 +280,46 @@ Config.shops = {
         }
     },
     vanhorn = {
-        shopName = 'Van Horn Wagons',
-        promptName = 'Van Horn Wagons',
-        blipOn = true,
-        blipName = 'Van Horn Wagons',
-        blipSprite = 1012165077,
-        blipOpen = 'WHITE',
-        blipClosed = 'RED',
-        blipJob = 'YELLOW_ORANGE',
-        npcOn = true,
-        npcModel = 's_m_m_coachtaxidriver_01',
-        npcPos = vector3(2993.25, 783.33, 50.23),
-        npcHeading = 97.4,
-        spawnPos = vector3(2984.43, 780.76, 50.11),
-        spawnHeading = 50.9,
-        wagonCam = vector3(2989.72, 785.28, 50.13),
-        nDistance = 100.0,
-        sDistance = 2.0,
-        allowedJobs = {},
-        jobGrade = 0,
-        shopHours = false,
-        shopOpen = 7,
-        shopClose = 21,
-        wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
+        shop = {
+            name        = 'Van Horn Wagons',
+            prompt      = 'Van Horn Wagons',
+            distance    = 2.0,
+            jobsEnabled = false,
+            jobs = {
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,
+                open   = 7,
+                close  = 21
+            }
+        },
+        blip = {
+            show       = true,
+            showClosed = true,
+            name       = 'Van Horn Wagons',
+            sprite     = 1012165077,
+            color = {
+                open   = 'WHITE',
+                closed = 'RED',
+                job    = 'YELLOW_ORANGE'
+            }
+        },
+        npc = {
+            active   = true,
+            model    = 's_m_m_coachtaxidriver_01',
+            coords   = vector3(2993.25, 783.33, 50.23),
+            heading  = 97.4,
+            distance = 100.0
+        },
+        wagon = {
+            coords  = vector3(2984.43, 780.76, 50.11),
+            heading = 50.9,
+            camera  = vector3(2989.72, 785.28, 50.13),
+        },
+        wainwrightBuy = false,
+        wagons = {
             {
                 name  = 'Buggies',
                 types = {
@@ -303,29 +367,46 @@ Config.shops = {
         }
     },
     lemoyne = {
-        shopName = 'Lemoyne Wagons',
-        promptName = 'Lemoyne Wagons',
-        blipOn = true,
-        blipName = 'Lemoyne Wagons',
-        blipSprite = 1012165077,
-        blipOpen = 'WHITE',
-        blipClosed = 'RED',
-        blipJob = 'YELLOW_ORANGE',
-        npcOn = true,
-        npcModel = 's_m_m_coachtaxidriver_01',
-        npcPos = vector3(1219.46, -195.59, 101.29),
-        npcHeading = 295.81,
-        spawnPos = vector3(1230.39, -198.39, 101.29),
-        spawnHeading = 255.99,
-        wagonCam = vector3(1227.33, -204.34, 100.89),
-        nDistance = 100.0,
-        sDistance = 2.0,
-        allowedJobs = {},
-        jobGrade = 0,
-        shopHours = false,
-        shopOpen = 7,
-        shopClose = 21,
-        wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
+        shop = {
+            name        = 'Lemoyne Wagons',
+            prompt      = 'Lemoyne Wagons',
+            distance    = 2.0,
+            jobsEnabled = false,
+            jobs = {
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,
+                open   = 7,
+                close  = 21
+            }
+        },
+        blip = {
+            show       = true,
+            showClosed = true,
+            name       = 'Lemoyne Wagons',
+            sprite     = 1012165077,
+            color = {
+                open   = 'WHITE',
+                closed = 'RED',
+                job    = 'YELLOW_ORANGE'
+            }
+        },
+        npc = {
+            active   = true,
+            model    = 's_m_m_coachtaxidriver_01',
+            coords   = vector3(1219.46, -195.59, 101.29),
+            heading  = 295.81,
+            distance = 100.0
+        },
+        wagon = {
+            coords  = vector3(1230.39, -198.39, 101.29),
+            heading = 255.99,
+            camera  = vector3(1227.33, -204.34, 100.89),
+        },
+        wainwrightBuy = false,
+        wagons = {
             {
                 name  = 'Buggies',
                 types = {
@@ -373,29 +454,46 @@ Config.shops = {
         }
     },
     saintdenis = {
-        shopName = 'Saint Denis Wagons',
-        promptName = 'Saint Denis Wagons',
-        blipOn = true,
-        blipName = 'Saint Denis Wagons',
-        blipSprite = 1012165077,
-        blipOpen = 'WHITE',
-        blipClosed = 'RED',
-        blipJob = 'YELLOW_ORANGE',
-        npcOn = true,
-        npcModel = 's_m_m_coachtaxidriver_01',
-        npcPos = vector3(2653.01, -1030.38, 44.87),
-        npcHeading = 145.95,
-        spawnPos = vector3(2657.36, -1038.59, 45.54),
-        spawnHeading = 95.3,
-        wagonCam = vector3(2653.01, -1032.47, 45.08),
-        nDistance = 100.0,
-        sDistance = 2.0,
-        allowedJobs = {},
-        jobGrade = 0,
-        shopHours = false,
-        shopOpen = 7,
-        shopClose = 21,
-        wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
+        shop = {
+            name        = 'Saint Denis Wagons',
+            prompt      = 'Saint Denis Wagons',
+            distance    = 2.0,
+            jobsEnabled = false,
+            jobs = {
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,
+                open   = 7,
+                close  = 21
+            }
+        },
+        blip = {
+            show       = true,
+            showClosed = true,
+            name       = 'Saint Denis Wagons',
+            sprite     = 1012165077,
+            color = {
+                open   = 'WHITE',
+                closed = 'RED',
+                job    = 'YELLOW_ORANGE'
+            }
+        },
+        npc = {
+            active   = true,
+            model    = 's_m_m_coachtaxidriver_01',
+            coords   = vector3(2653.01, -1030.38, 44.87),
+            heading  = 145.95,
+            distance = 100.0
+        },
+        wagon = {
+            coords  = vector3(2657.36, -1038.59, 45.54),
+            heading = 95.3,
+            camera  = vector3(2653.01, -1032.47, 45.08),
+        },
+        wainwrightBuy = false,
+        wagons = {
             {
                 name  = 'Buggies',
                 types = {
@@ -443,29 +541,46 @@ Config.shops = {
         }
     },
     blackwater = {
-        shopName = 'Blackwater Wagons',
-        promptName = 'Blackwater Wagons',
-        blipOn = true,
-        blipName = 'Blackwater Wagons',
-        blipSprite = 1012165077,
-        blipOpen = 'WHITE',
-        blipClosed = 'RED',
-        blipJob = 'YELLOW_ORANGE',
-        npcOn = true,
-        npcModel = 's_m_m_coachtaxidriver_01',
-        npcPos = vector3(-876.06, -1374.64, 43.56),
-        npcHeading = 180.44,
-        spawnPos = vector3(-876.22, -1383.45, 43.48),
-        spawnHeading = 98.35,
-        wagonCam = vector3(-879.41, -1376.95, 43.58),
-        nDistance = 100.0,
-        sDistance = 2.0,
-        allowedJobs = {},
-        jobGrade = 0,
-        shopHours = false,
-        shopOpen = 7,
-        shopClose = 21,
-        wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
+        shop = {
+            name        = 'Blackwater Wagons',
+            prompt      = 'Blackwater Wagons',
+            distance    = 2.0,
+            jobsEnabled = false,
+            jobs = {
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,
+                open   = 7,
+                close  = 21
+            }
+        },
+        blip = {
+            show       = true,
+            showClosed = true,
+            name       = 'Blackwater Wagons',
+            sprite     = 1012165077,
+            color = {
+                open   = 'WHITE',
+                closed = 'RED',
+                job    = 'YELLOW_ORANGE'
+            }
+        },
+        npc = {
+            active   = true,
+            model    = 's_m_m_coachtaxidriver_01',
+            coords   = vector3(-876.06, -1374.64, 43.56),
+            heading  = 180.44,
+            distance = 100.0
+        },
+        wagon = {
+            coords  = vector3(-876.22, -1383.45, 43.48),
+            heading = 98.35,
+            camera  = vector3(-879.41, -1376.95, 43.58),
+        },
+        wainwrightBuy = false,
+        wagons = {
             {
                 name  = 'Buggies',
                 types = {
@@ -513,29 +628,46 @@ Config.shops = {
         }
     },
     tumbleweed = {
-        shopName = 'Tumbleweed Wagons',
-        promptName = 'Tumbleweed Wagons',
-        blipOn = true,
-        blipName = 'Tumbleweed Wagons',
-        blipSprite = 1012165077,
-        blipOpen = 'WHITE',
-        blipClosed = 'RED',
-        blipJob = 'YELLOW_ORANGE',
-        npcOn = true,
-        npcModel = 's_m_m_coachtaxidriver_01',
-        npcPos = vector3(-5539.02, -3021.74, -1.32),
-        npcHeading = 23.06,
-        spawnPos = vector3(-5547.98, -3020.25, -1.56),
-        spawnHeading = 39.58,
-        wagonCam = vector3(-5541.83, -3017.31, -1.23),
-        nDistance = 100.0,
-        sDistance = 2.0,
-        allowedJobs = {},
-        jobGrade = 0,
-        shopHours = false,
-        shopOpen = 7,
-        shopClose = 21,
-        wagons = { -- Change ONLY These Values: boatType, label, cashPrice, goldPrice and sellPrice
+        shop = {
+            name        = 'Tumbleweed Wagons',
+            prompt      = 'Tumbleweed Wagons',
+            distance    = 2.0,
+            jobsEnabled = false,
+            jobs = {
+                {name = 'police', grade = 1},
+                {name = 'doctor', grade = 3}
+            },
+            hours = {
+                active = false,
+                open   = 7,
+                close  = 21
+            }
+        },
+        blip = {
+            show       = true,
+            showClosed = true,
+            name       = 'Tumbleweed Wagons',
+            sprite     = 1012165077,
+            color = {
+                open   = 'WHITE',
+                closed = 'RED',
+                job    = 'YELLOW_ORANGE'
+            }
+        },
+        npc = {
+            active   = true,
+            model    = 's_m_m_coachtaxidriver_01',
+            coords   = vector3(-5539.02, -3021.74, -1.32),
+            heading  = 23.06,
+            distance = 100.0
+        },
+        wagon = {
+            coords  = vector3(-5547.98, -3020.25, -1.56),
+            heading = 39.58,
+            camera  = vector3(-5541.83, -3017.31, -1.23),
+        },
+        wainwrightBuy = false,
+        wagons = {
             {
                 name  = 'Buggies',
                 types = {

@@ -1,12 +1,14 @@
-local VORPcore = {}
-TriggerEvent('getCore', function(core)
-    VORPcore = core
-end)
-local ClientRPC = exports.vorp_core:ClientRpcCall()
+local VORPcore = exports.vorp_core:GetCore()
 -- Prompts
 local OpenShops
 local OpenReturn
 local PromptGroup = GetRandomIntInRange(0, 0xffffff)
+local TradeWagon
+local TradeGroup = GetRandomIntInRange(0, 0xffffff)
+local TargetReturn = nil
+local TargetTrade = nil
+
+local PromptsStarted = false
 -- Wagons
 local ShopName
 local ShopEntity
@@ -14,223 +16,216 @@ local MyEntity
 local MyWagon = nil
 local MyWagonId
 local MyWagonName
-local Shop
+local Site
 local InMenu = false
 local Cam = false
-local HasJob = nil
+local HasJob = false
+local IsWainwright = false
+local Trading = false
 -- Start Wagons
 CreateThread(function()
     StartPrompts()
     while true do
-        Wait(0)
         local playerPed = PlayerPedId()
         local pCoords = GetEntityCoords(playerPed)
-        local sleep = true
+        local sleep = 1000
         local hour = GetClockHours()
-        if not InMenu and not IsEntityDead(playerPed) then
-            for shop, shopCfg in pairs(Config.shops) do
-                if shopCfg.shopHours then
-                    -- Using Shop Hours - Shop Closed
-                    if hour >= shopCfg.shopClose or hour < shopCfg.shopOpen then
-                        if shopCfg.blipOn and Config.blipOnClosed then
-                            if not Config.shops[shop].Blip then
-                                AddBlip(shop)
-                            end
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipClosed])) -- BlipAddModifier
-                        else
-                            if Config.shops[shop].Blip then
-                                RemoveBlip(Config.shops[shop].Blip)
-                                Config.shops[shop].Blip = nil
-                            end
+        if InMenu or IsEntityDead(playerPed) then
+            goto continue
+        end
+        for site, siteCfg in pairs(Config.shops) do
+            if siteCfg.shop.hours.active then
+                -- Using Shop Hours - Shop Closed
+                if hour >= siteCfg.shop.hours.close or hour < siteCfg.shop.hours.open then
+                    if siteCfg.blip.show and siteCfg.blip.showClosed then
+                        if not Config.shops[site].Blip then
+                            AddBlip(site)
                         end
-                        if shopCfg.NPC then
-                            DeleteEntity(shopCfg.NPC)
-                            shopCfg.NPC = nil
-                        end
-                        local sDist = #(pCoords - shopCfg.npcPos)
-                        if sDist <= shopCfg.sDistance then
-                            sleep = false
-                            local shopClosed = CreateVarString(10, 'LITERAL_STRING', shopCfg.shopName .. _U('hours') .. shopCfg.shopOpen .. _U('to') .. shopCfg.shopClose .. _U('hundred'))
-                            PromptSetActiveGroupThisFrame(PromptGroup, shopClosed)
-                            PromptSetEnabled(OpenShops, 0)
-                            PromptSetEnabled(OpenReturn, 0)
-                        end
-                    elseif hour >= shopCfg.shopOpen then
-                        -- Using Shop Hours - Shop Open
-                        if shopCfg.blipOn and not Config.shops[shop].Blip then
-                            AddBlip(shop)
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipOpen])) -- BlipAddModifier
-                        end
-                        if not next(shopCfg.allowedJobs) then
-                            local sDist = #(pCoords - shopCfg.npcPos)
-                            if shopCfg.npcOn then
-                                if sDist <= shopCfg.nDistance then
-                                    if not shopCfg.NPC then
-                                        AddNPC(shop)
-                                    end
-                                end
-                            else
-                                if shopCfg.NPC then
-                                    DeleteEntity(shopCfg.NPC)
-                                    shopCfg.NPC = nil
-                                end
-                            end
-                            if sDist <= shopCfg.sDistance then
-                                sleep = false
-                                local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                                PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
-                                PromptSetEnabled(OpenShops, 1)
-                                PromptSetEnabled(OpenReturn, 1)
-
-                                if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                    OpenMenu(shop)
-                                elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                    ReturnWagon()
-                                end
-                            end
-                        else
-                            -- Using Shop Hours - Shop Open - Job Locked
-                            if Config.shops[shop].Blip then
-                                Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipJob])) -- BlipAddModifier
-                            end
-                            local sDist = #(pCoords - shopCfg.npcPos)
-                            if shopCfg.npcOn then
-                                if sDist <= shopCfg.nDistance then
-                                    if not shopCfg.NPC then
-                                        AddNPC(shop)
-                                    end
-                                end
-                            else
-                                if shopCfg.NPC then
-                                    DeleteEntity(shopCfg.NPC)
-                                    shopCfg.NPC = nil
-                                end
-                            end
-                            if sDist <= shopCfg.sDistance then
-                                sleep = false
-                                local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                                PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
-                                PromptSetEnabled(OpenShops, 1)
-                                PromptSetEnabled(OpenReturn, 1)
-
-                                if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                    local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
-                                    if result then
-                                        OpenMenu(shop)
-                                    else
-                                        return
-                                    end
-                                elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                    local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
-                                    if result then
-                                        ReturnWagon()
-                                    else
-                                        return
-                                    end
-                                end
-                            end
+                        Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[site].Blip, joaat(Config.BlipColors[siteCfg.blip.color.closed])) -- BlipAddModifier
+                    else
+                        if Config.shops[site].Blip then
+                            RemoveBlip(Config.shops[site].Blip)
+                            Config.shops[site].Blip = nil
                         end
                     end
-                else
-                    -- Not Using Shop Hours - Shop Always Open
-                    if shopCfg.blipOn and not Config.shops[shop].Blip then
-                        AddBlip(shop)
-                        Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipOpen])) -- BlipAddModifier
+                    if siteCfg.NPC then
+                        DeleteEntity(siteCfg.NPC)
+                        siteCfg.NPC = nil
                     end
-                    if not next(shopCfg.allowedJobs) then
-                        local sDist = #(pCoords - shopCfg.npcPos)
-                        if shopCfg.npcOn then
-                            if sDist <= shopCfg.nDistance then
-                                if not shopCfg.NPC then
-                                    AddNPC(shop)
+                    local sDist = #(pCoords - siteCfg.npc.coords)
+                    if sDist <= siteCfg.shop.distance then
+                        sleep = 0
+                        PromptSetActiveGroupThisFrame(PromptGroup,
+                        CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.name .. _U('hours') .. siteCfg.shop.hours.open .. _U('to') .. siteCfg.shop.hours.close .. _U('hundred')))
+                        PromptSetEnabled(OpenShops, false)
+                        PromptSetEnabled(OpenReturn, false)
+                    end
+                elseif hour >= siteCfg.shop.hours.open then
+                    -- Using Shop Hours - Shop Open
+                    if siteCfg.blip.show and not Config.shops[site].Blip then
+                        AddBlip(site)
+                        Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[site].Blip, joaat(Config.BlipColors[siteCfg.blip.color.open])) -- BlipAddModifier
+                    end
+                    if not siteCfg.shop.jobsEnabled then
+                        local sDist = #(pCoords - siteCfg.npc.coords)
+                        if siteCfg.npc.active then
+                            if sDist <= siteCfg.npc.distance then
+                                if not siteCfg.NPC then
+                                    AddNPC(site)
                                 end
                             end
                         else
-                            if shopCfg.NPC then
-                                DeleteEntity(shopCfg.NPC)
-                                shopCfg.NPC = nil
+                            if siteCfg.NPC then
+                                DeleteEntity(siteCfg.NPC)
+                                siteCfg.NPC = nil
                             end
                         end
-                        if sDist <= shopCfg.sDistance then
-                            sleep = false
-                            local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                            PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
-                            PromptSetEnabled(OpenShops, 1)
-                            PromptSetEnabled(OpenReturn, 1)
+                        if sDist <= siteCfg.shop.distance then
+                            sleep = 0
+                            PromptSetActiveGroupThisFrame(PromptGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.prompt))
+                            PromptSetEnabled(OpenShops, true)
+                            PromptSetEnabled(OpenReturn, true)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                OpenMenu(shop)
+                                OpenMenu(site)
                             elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
                                 ReturnWagon()
                             end
                         end
                     else
-                        -- Not Using Shop Hours - Shop Always Open - Job Locked
-                        if Config.shops[shop].Blip then
-                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[shop].Blip, joaat(Config.BlipColors[shopCfg.blipJob])) -- BlipAddModifier
+                        -- Using Shop Hours - Shop Open - Job Locked
+                        if Config.shops[site].Blip then
+                            Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[site].Blip, joaat(Config.BlipColors[siteCfg.blip.color.job])) -- BlipAddModifier
                         end
-                        local sDist = #(pCoords - shopCfg.npcPos)
-                        if shopCfg.npcOn then
-                            if sDist <= shopCfg.nDistance then
-                                if not shopCfg.NPC then
-                                    AddNPC(shop)
+                        local sDist = #(pCoords - siteCfg.npc.coords)
+                        if siteCfg.npc.active then
+                            if sDist <= siteCfg.npc.distance then
+                                if not siteCfg.NPC then
+                                    AddNPC(site)
                                 end
                             end
                         else
-                            if shopCfg.NPC then
-                                DeleteEntity(shopCfg.NPC)
-                                shopCfg.NPC = nil
+                            if siteCfg.NPC then
+                                DeleteEntity(siteCfg.NPC)
+                                siteCfg.NPC = nil
                             end
                         end
-                        if sDist <= shopCfg.sDistance then
-                            sleep = false
-                            local shopOpen = CreateVarString(10, 'LITERAL_STRING', shopCfg.promptName)
-                            PromptSetActiveGroupThisFrame(PromptGroup, shopOpen)
-                            PromptSetEnabled(OpenShops, 1)
-                            PromptSetEnabled(OpenReturn, 1)
+                        if sDist <= siteCfg.shop.distance then
+                            sleep = 0
+                            PromptSetActiveGroupThisFrame(PromptGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.prompt))
+                            PromptSetEnabled(OpenShops, true)
+                            PromptSetEnabled(OpenReturn, true)
 
                             if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
-                                local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
-                                if result then
-                                    OpenMenu(shop)
+                                CheckPlayerJob(false, site)
+                                if HasJob then
+                                    OpenMenu(site)
                                 else
-                                    return
+                                    VORPcore.NotifyRightTip(_U('needJob'), 4000)
                                 end
                             elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
-                                local result = ClientRPC.Callback.TriggerAwait('bcc-wagons:CheckPlayerJob', shop)
-                                if result then
+                                CheckPlayerJob(false, site)
+                                if HasJob then
                                     ReturnWagon()
                                 else
-                                    return
+                                    VORPcore.NotifyRightTip(_U('needJob'), 4000)
                                 end
+                            end
+                        end
+                    end
+                end
+            else
+                -- Not Using Shop Hours - Shop Always Open
+                if siteCfg.blip.show and not Config.shops[site].Blip then
+                    AddBlip(site)
+                    Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[site].Blip, joaat(Config.BlipColors[siteCfg.blip.color.open])) -- BlipAddModifier
+                end
+                if not siteCfg.shop.jobsEnabled then
+                    local sDist = #(pCoords - siteCfg.npc.coords)
+                    if siteCfg.npc.active then
+                        if sDist <= siteCfg.npc.distance then
+                            if not siteCfg.NPC then
+                                AddNPC(site)
+                            end
+                        end
+                    else
+                        if siteCfg.NPC then
+                            DeleteEntity(siteCfg.NPC)
+                            siteCfg.NPC = nil
+                        end
+                    end
+                    if sDist <= siteCfg.shop.distance then
+                        sleep = 0
+                        PromptSetActiveGroupThisFrame(PromptGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.prompt))
+                        PromptSetEnabled(OpenShops, true)
+                        PromptSetEnabled(OpenReturn, true)
+
+                        if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
+                            OpenMenu(site)
+                        elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
+                            ReturnWagon()
+                        end
+                    end
+                else
+                    -- Not Using Shop Hours - Shop Always Open - Job Locked
+                    if Config.shops[site].Blip then
+                        Citizen.InvokeNative(0x662D364ABF16DE2F, Config.shops[site].Blip, joaat(Config.BlipColors[siteCfg.blip.color.job])) -- BlipAddModifier
+                    end
+                    local sDist = #(pCoords - siteCfg.npc.coords)
+                    if siteCfg.npc.active then
+                        if sDist <= siteCfg.npc.distance then
+                            if not siteCfg.NPC then
+                                AddNPC(site)
+                            end
+                        end
+                    else
+                        if siteCfg.NPC then
+                            DeleteEntity(siteCfg.NPC)
+                            siteCfg.NPC = nil
+                        end
+                    end
+                    if sDist <= siteCfg.shop.distance then
+                        sleep = 0
+                        PromptSetActiveGroupThisFrame(PromptGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.prompt))
+                        PromptSetEnabled(OpenShops, true)
+                        PromptSetEnabled(OpenReturn, true)
+
+                        if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
+                            CheckPlayerJob(false, site)
+                            if HasJob then
+                                OpenMenu(site)
+                            else
+                                VORPcore.NotifyRightTip(_U('needJob'), 4000)
+                            end
+                        elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
+                            CheckPlayerJob(false, site)
+                            if HasJob then
+                                ReturnWagon()
+                            else
+                                VORPcore.NotifyRightTip(_U('needJob'), 4000)
                             end
                         end
                     end
                 end
             end
         end
-        if sleep then
-            Wait(1000)
-        end
+        ::continue::
+        Wait(sleep)
     end
 end)
 
--- Open Main Menu
-function OpenMenu(shop)
+function OpenMenu(site)
     DisplayRadar(false)
     InMenu = true
-    Shop = shop
-    ShopName = Config.shops[Shop].shopName
+    Site = site
+    ShopName = Config.shops[Site].shop.name
 
-    if MyWagon then
-        DeleteEntity(MyWagon)
-        MyWagon = nil
-    end
+    ResetWagon()
     CreateCamera()
 
     SendNUIMessage({
         action = 'show',
-        shopData = Config.shops[Shop].wagons,
+        shopData = Config.shops[Site].wagons,
         location = ShopName,
         currencyType = Config.currencyType
     })
@@ -238,7 +233,6 @@ function OpenMenu(shop)
     TriggerServerEvent('bcc-wagons:GetMyWagons')
 end
 
--- Get Wagon Data for Players Wagons
 RegisterNetEvent('bcc-wagons:WagonsData', function(wagonsData)
     SendNUIMessage({
         action = 'updateMyWagons',
@@ -246,7 +240,6 @@ RegisterNetEvent('bcc-wagons:WagonsData', function(wagonsData)
     })
 end)
 
--- View Wagons for Purchase
 RegisterNUICallback('LoadWagon', function(data, cb)
     cb('ok')
     if MyEntity then
@@ -262,8 +255,8 @@ RegisterNUICallback('LoadWagon', function(data, cb)
         ShopEntity = nil
     end
 
-    local shopCfg = Config.shops[Shop]
-    ShopEntity = CreateVehicle(model, shopCfg.spawnPos, shopCfg.spawnHeading, false, false, false, false)
+    local siteCfg = Config.shops[Site]
+    ShopEntity = CreateVehicle(model, siteCfg.wagon.coords, siteCfg.wagon.heading, false, false, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, ShopEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, ShopEntity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
@@ -273,10 +266,20 @@ RegisterNUICallback('LoadWagon', function(data, cb)
     end
 end)
 
--- Buy and Name New Wagons
 RegisterNUICallback('BuyWagon', function(data, cb)
     cb('ok')
-    local canBuy = ClientRPC.Callback.TriggerAwait('bcc-wagons:BuyWagon', data)
+    CheckPlayerJob(true)
+    if Config.shops[Site].wainwrightBuy and not IsWainwright then
+        VORPcore.NotifyRightTip(_U('wainwrightBuyWagon'), 4000)
+        WagonMenu()
+        return
+    end
+    if IsWainwright then
+        data.isWainwright = true
+    else
+        data.isWainwright = false
+    end
+    local canBuy = VORPcore.Callback.TriggerAwait('bcc-wagons:BuyWagon', data)
     if canBuy then
         SetWagonName(data, false)
     else
@@ -303,13 +306,13 @@ function SetWagonName(data, rename)
             if string.len(wagonName) > 0 then
                 local wagonInfo = {wagonData = data, name = wagonName}
                 if rename then
-                    local nameSaved = ClientRPC.Callback.TriggerAwait('bcc-wagons:UpdateWagonName', wagonInfo)
+                    local nameSaved = VORPcore.Callback.TriggerAwait('bcc-wagons:UpdateWagonName', wagonInfo)
                     if nameSaved then
                         WagonMenu()
                     end
                     return
                 else
-                    local wagonSaved = ClientRPC.Callback.TriggerAwait('bcc-wagons:SaveNewWagon', wagonInfo)
+                    local wagonSaved = VORPcore.Callback.TriggerAwait('bcc-wagons:SaveNewWagon', wagonInfo)
                     if wagonSaved then
                         WagonMenu()
                     end
@@ -322,7 +325,7 @@ function SetWagonName(data, rename)
         end
         SendNUIMessage({
             action = 'show',
-            shopData = Config.shops[Shop].wagons,
+            shopData = Config.shops[Site].wagons,
             location = ShopName,
             currencyType = Config.currencyType
         })
@@ -331,13 +334,11 @@ function SetWagonName(data, rename)
     end)
 end
 
--- Rename Owned Wagon
 RegisterNUICallback('RenameWagon', function(data, cb)
     cb('ok')
     SetWagonName(data, true)
 end)
 
--- View Player Owned Wagons
 RegisterNUICallback('LoadMyWagon', function(data, cb)
     cb('ok')
     if ShopEntity then
@@ -353,8 +354,8 @@ RegisterNUICallback('LoadMyWagon', function(data, cb)
         MyEntity = nil
     end
 
-    local shopCfg = Config.shops[Shop]
-    MyEntity = CreateVehicle(model, shopCfg.spawnPos, shopCfg.spawnHeading, false, false, false, false)
+    local siteCfg = Config.shops[Site]
+    MyEntity = CreateVehicle(model, siteCfg.wagon.coords, siteCfg.wagon.heading, false, false, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, MyEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyEntity, true) -- FreezeEntityPosition
     SetModelAsNoLongerNeeded(model)
@@ -364,39 +365,33 @@ RegisterNUICallback('LoadMyWagon', function(data, cb)
     end
 end)
 
--- Select Active Wagon
 RegisterNUICallback('SelectWagon', function(data, cb)
     cb('ok')
     TriggerServerEvent('bcc-wagons:SelectWagon', data)
 end)
 
 function GetSelectedWagon()
-    local data = ClientRPC.Callback.TriggerAwait('bcc-wagons:GetWagonData')
+    local data = VORPcore.Callback.TriggerAwait('bcc-wagons:GetWagonData')
     if data then
         MyWagonId = data.invDist
         SpawnWagon(data.model, data.name, false, data.id)
     end
 end
 
--- Spawn Player Owned Wagons
 RegisterNUICallback('SpawnInfo', function(data, cb)
     cb('ok')
     SpawnWagon(data.WagonModel, data.WagonName, true, data.WagonId)
 end)
 
 function SpawnWagon(wagonModel, name, menuSpawn, id)
-    if MyWagon then
-        DeleteEntity(MyWagon)
-        MyWagon = nil
-    end
-
+    ResetWagon()
     MyWagonName = name
     local model = joaat(wagonModel)
     LoadWagonModel(model)
 
     if menuSpawn then
-        local shopCfg = Config.shops[Shop]
-        MyWagon = CreateVehicle(model, shopCfg.spawnPos, shopCfg.spawnHeading, true, false, false, false)
+        local siteCfg = Config.shops[Site]
+        MyWagon = CreateVehicle(model, siteCfg.wagon.coords, siteCfg.wagon.heading, true, false, false, false)
         Citizen.InvokeNative(0x7263332501E07F52, MyWagon, true) -- SetVehicleOnGroundProperly
         SetModelAsNoLongerNeeded(model)
         if Config.seated then
@@ -480,18 +475,16 @@ AddEventHandler('bcc-wagons:WagonBlip', function()
     end
 end)
 
--- Sell Player Owned Wagons
 RegisterNUICallback('SellWagon', function(data, cb)
     cb('ok')
     DeleteEntity(MyEntity)
     Cam = false
-    local wagonSold = ClientRPC.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data, Shop)
+    local wagonSold = VORPcore.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data, Site)
     if wagonSold then
         WagonMenu()
     end
 end)
 
--- Close Main Menu
 RegisterNUICallback('CloseMenu', function(data, cb)
     cb('ok')
     SendNUIMessage({
@@ -525,7 +518,7 @@ function WagonMenu()
 
     SendNUIMessage({
         action = 'show',
-        shopData = Config.shops[Shop].wagons,
+        shopData = Config.shops[Site].wagons,
         location = ShopName,
         currencyType = Config.currencyType
     })
@@ -555,7 +548,6 @@ CreateThread(function()
     end
 end)
 
--- Wagon Actions
 AddEventHandler('bcc-wagons:WagonActions', function()
     local invKey = Config.keys.inv
     while MyWagon do
@@ -573,46 +565,101 @@ end)
 -- Return Wagon Using Prompt at Shop Location
 function ReturnWagon()
     if MyWagon then
-        DeleteEntity(MyWagon)
-        MyWagon = nil
+        ResetWagon()
         VORPcore.NotifyRightTip(_U('wagonReturned'), 4000)
     else
         VORPcore.NotifyRightTip(_U('noWagonReturn'), 4000)
     end
 end
 
--- Target Menu Wagon Return
 AddEventHandler('bcc-wagons:WagonTarget', function()
     local playerPed = PlayerPedId()
     local player = PlayerId()
-    local returnDist = Config.returnDist
+    local targetDist = Config.targetDist
     while MyWagon do
         local sleep = 1000
         local dist = #(GetEntityCoords(playerPed) - GetEntityCoords(MyWagon))
-        if dist <= returnDist then
-            Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, true) -- SetVehicleCanBeTargetted
-            if not Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
-                local _, targetEntity = GetPlayerTargetEntity(player)
-                if Citizen.InvokeNative(0x27F89FDC16688A7A, player, MyWagon, 0) then -- IsPlayerTargettingEntity
-                    sleep = 0
-                    local wagonGroup = Citizen.InvokeNative(0xB796970BD125FCE8, targetEntity) -- PromptGetGroupIdForTargetEntity
-                    TriggerEvent('bcc-wagons:TargetReturn', wagonGroup)
-                    if Citizen.InvokeNative(0x580417101DDB492F, 2, Config.keys.targetRet) then -- IsControlJustPressed
-                        DoScreenFadeOut(100)
-                        Wait(100)
-                        DeleteEntity(MyWagon)
-                        MyWagon = nil
-                        Wait(100)
-                        DoScreenFadeIn(100)
+        if dist > targetDist or Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
+            Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, false) -- SetVehicleCanBeTargetted
+            goto continue
+        end
+        Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, true) -- SetVehicleCanBeTargetted
+        if Citizen.InvokeNative(0x27F89FDC16688A7A, player, MyWagon, 0) then -- IsPlayerTargettingEntity
+            sleep = 0
+            local wagonGroup = Citizen.InvokeNative(0xB796970BD125FCE8, MyWagon) -- PromptGetGroupIdForTargetEntity
+            TriggerEvent('bcc-wagons:TargetPrompts', wagonGroup)
+
+            if Citizen.InvokeNative(0x580417101DDB492F, 0, Config.keys.targetRet) then -- IsControlJustPressed
+                DoScreenFadeOut(500)
+                Wait(500)
+                ResetWagon()
+                Wait(500)
+                DoScreenFadeIn(500)
+
+            elseif Citizen.InvokeNative(0x580417101DDB492F, 0, Config.keys.targetTrade) then -- IsControlJustPressed
+                VORPcore.NotifyRightTip(_U('readyToTrade'), 4000)
+                Trading = true
+                TriggerEvent('bcc-wagons:TradeWagon')
+            end
+        end
+        ::continue::
+        Wait(sleep)
+    end
+end)
+
+AddEventHandler('bcc-wagons:TradeWagon', function()
+    while Trading do
+        local playerPed = PlayerPedId()
+        local sleep = 1000
+        if not IsEntityDead(playerPed) then
+            local closestPlayer, closestDistance = GetClosestPlayer()
+            if closestPlayer and closestDistance <= 2.0 then
+                sleep = 0
+                PromptSetActiveGroupThisFrame(TradeGroup, CreateVarString(10, 'LITERAL_STRING', MyWagonName))
+                PromptSetEnabled(TradeWagon, true)
+                if Citizen.InvokeNative(0xE0F65F0640EF0617, TradeWagon) then  -- PromptHasHoldModeCompleted
+                    local serverId = GetPlayerServerId(closestPlayer)
+                    local tradeComplete = VORPcore.Callback.TriggerAwait('bcc-wagons:SaveWagonTrade', serverId, MyWagonId)
+                    if tradeComplete then
+                        ResetWagon()
                     end
+                    Trading = false
                 end
             end
-        else
-            Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, false) -- SetVehicleCanBeTargetted
         end
         Wait(sleep)
     end
 end)
+
+function GetClosestPlayer()
+    local players = GetActivePlayers()
+    local player = PlayerId()
+    local coords = GetEntityCoords(PlayerPedId())
+    local closestDistance = nil
+    local closestPlayer = nil
+    for i = 1, #players, 1 do
+        local target = GetPlayerPed(players[i])
+        if players[i] ~= player then
+            local distance = #(coords - GetEntityCoords(target))
+            if closestDistance == nil or closestDistance > distance then
+                closestPlayer = players[i]
+                closestDistance = distance
+            end
+        end
+    end
+    return closestPlayer, closestDistance
+end
+
+function ResetWagon()
+    if MyWagon then
+        DeleteEntity(MyWagon)
+        MyWagon = nil
+    end
+    PromptsStarted = false
+    TargetReturn = nil
+    TargetTrade = nil
+    Trading = false
+end
 
 function LoadWagonModel(model)
     RequestModel(model)
@@ -623,11 +670,11 @@ end
 
 -- Camera to View Wagons
 function CreateCamera()
-    local shopCfg = Config.shops[Shop]
+    local siteCfg = Config.shops[Site]
     local wagonCam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-    SetCamCoord(wagonCam, shopCfg.wagonCam.x, shopCfg.wagonCam.y, shopCfg.wagonCam.z + 2.0)
+    SetCamCoord(wagonCam, siteCfg.wagon.camera.x, siteCfg.wagon.camera.y, siteCfg.wagon.camera.z + 2.0)
     SetCamActive(wagonCam, true)
-    PointCamAtCoord(wagonCam, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z)
+    PointCamAtCoord(wagonCam, siteCfg.wagon.coords.x, siteCfg.wagon.coords.y, siteCfg.wagon.coords.z)
     DoScreenFadeOut(500)
     Wait(500)
     DoScreenFadeIn(500)
@@ -636,10 +683,10 @@ function CreateCamera()
 end
 
 function CameraLighting()
-    local shopCfg = Config.shops[Shop]
+    local siteCfg = Config.shops[Site]
     while Cam do
         Wait(0)
-        Citizen.InvokeNative(0xD2D9E04C0DF927F4, shopCfg.spawnPos.x, shopCfg.spawnPos.y, shopCfg.spawnPos.z + 3, 130, 130, 85, 4.0, 15.0) -- DrawLightWithRange
+        Citizen.InvokeNative(0xD2D9E04C0DF927F4, siteCfg.wagon.coords.x, siteCfg.wagon.coords.y, siteCfg.wagon.coords.z + 3, 130, 130, 85, 4.0, 15.0) -- DrawLightWithRange
     end
 end
 
@@ -664,7 +711,23 @@ function Rotation(dir)
     end
 end
 
-RegisterCommand('wagonEnter', function()
+function CheckPlayerJob(wainwright, site)
+    if wainwright then
+        IsWainwright = false
+    else
+        HasJob = false
+    end
+    local result = VORPcore.Callback.TriggerAwait('bcc-wagons:CheckJob', wainwright, site)
+    if result then
+        if wainwright then
+            IsWainwright = true
+        else
+            HasJob = true
+        end
+    end
+end
+
+RegisterCommand(Config.commands.wagonEnter, function()
     if MyWagon then
         DoScreenFadeOut(500)
         Wait(500)
@@ -676,7 +739,7 @@ RegisterCommand('wagonEnter', function()
     end
 end, false)
 
-RegisterCommand('wagonReturn', function()
+RegisterCommand(Config.commands.wagonReturn, function()
     if Config.returnEnabled then
         ReturnWagon()
     else
@@ -684,59 +747,74 @@ RegisterCommand('wagonReturn', function()
     end
 end)
 
--- Menu Prompts
 function StartPrompts()
-    local shopStr = CreateVarString(10, 'LITERAL_STRING', _U('shopPrompt'))
     OpenShops = PromptRegisterBegin()
     PromptSetControlAction(OpenShops, Config.keys.shop)
-    PromptSetText(OpenShops, shopStr)
-    PromptSetVisible(OpenShops, 1)
-    PromptSetStandardMode(OpenShops, 1)
+    PromptSetText(OpenShops, CreateVarString(10, 'LITERAL_STRING', _U('shopPrompt')))
+    PromptSetVisible(OpenShops, true)
+    PromptSetStandardMode(OpenShops, true)
     PromptSetGroup(OpenShops, PromptGroup)
     PromptRegisterEnd(OpenShops)
 
-    local returnStr = CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt'))
     OpenReturn = PromptRegisterBegin()
     PromptSetControlAction(OpenReturn, Config.keys.ret)
-    PromptSetText(OpenReturn, returnStr)
-    PromptSetVisible(OpenReturn, 1)
-    PromptSetStandardMode(OpenReturn, 1)
+    PromptSetText(OpenReturn, CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt')))
+    PromptSetVisible(OpenReturn, true)
+    PromptSetStandardMode(OpenReturn, true)
     PromptSetGroup(OpenReturn, PromptGroup)
     PromptRegisterEnd(OpenReturn)
+
+    TradeWagon = PromptRegisterBegin()
+    PromptSetControlAction(TradeWagon, Config.keys.trade)
+    PromptSetText(TradeWagon, CreateVarString(10, 'LITERAL_STRING', _U('tradePrompt')))
+    PromptSetVisible(TradeWagon, true)
+    PromptSetHoldMode(TradeWagon, 2000)
+    PromptSetGroup(TradeWagon, TradeGroup)
+    PromptRegisterEnd(TradeWagon)
 end
 
-AddEventHandler('bcc-wagons:TargetReturn', function(wagonGroup)
-    local str = CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt'))
-    local targetReturn = PromptRegisterBegin()
-    PromptSetControlAction(targetReturn, Config.keys.targetRet)
-    PromptSetText(targetReturn, str)
-    PromptSetEnabled(targetReturn, 1)
-    PromptSetVisible(targetReturn, 1)
-    PromptSetHoldMode(targetReturn, 1)
-    PromptSetGroup(targetReturn, wagonGroup)
-    PromptRegisterEnd(targetReturn)
+AddEventHandler('bcc-wagons:TargetPrompts', function(wagonGroup)
+    if not PromptsStarted then
+        TargetReturn = PromptRegisterBegin()
+        PromptSetControlAction(TargetReturn, Config.keys.targetRet)
+        PromptSetText(TargetReturn, CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt')))
+        PromptSetEnabled(TargetReturn, true)
+        PromptSetVisible(TargetReturn, true)
+        PromptSetStandardMode(TargetReturn, true)
+        PromptSetGroup(TargetReturn, wagonGroup)
+        PromptRegisterEnd(TargetReturn)
+
+        TargetTrade = PromptRegisterBegin()
+        PromptSetControlAction(TargetTrade, Config.keys.targetTrade)
+        PromptSetText(TargetTrade, CreateVarString(10, 'LITERAL_STRING', _U('targetTradePrompt')))
+        PromptSetEnabled(TargetTrade, true)
+        PromptSetVisible(TargetTrade, true)
+        PromptSetStandardMode(TargetTrade, true)
+        PromptSetGroup(TargetTrade, wagonGroup)
+        PromptRegisterEnd(TargetTrade)
+
+        PromptsStarted = true
+    end
 end)
 
--- Blips
-function AddBlip(shop)
-    local shopCfg = Config.shops[shop]
-    shopCfg.Blip = Citizen.InvokeNative(0x554d9d53f696d002, 1664425300, shopCfg.npcPos) -- BlipAddForCoords
-    SetBlipSprite(shopCfg.Blip, shopCfg.blipSprite, true)
-    SetBlipScale(shopCfg.Blip, 0.2)
-    Citizen.InvokeNative(0x9CB1A1623062F402, shopCfg.Blip, shopCfg.blipName) -- SetBlipName
+function AddBlip(site)
+    local siteCfg = Config.shops[site]
+    siteCfg.Blip = Citizen.InvokeNative(0x554d9d53f696d002, 1664425300, siteCfg.npc.coords) -- BlipAddForCoords
+    SetBlipSprite(siteCfg.Blip, siteCfg.blip.sprite, true)
+    SetBlipScale(siteCfg.Blip, 0.2)
+    Citizen.InvokeNative(0x9CB1A1623062F402, siteCfg.Blip, siteCfg.blip.name) -- SetBlipName
 end
 
--- NPCs
-function AddNPC(shop)
-    local shopCfg = Config.shops[shop]
-    LoadModel(shopCfg.npcModel)
-    shopCfg.NPC = CreatePed(shopCfg.npcModel, shopCfg.npcPos.x, shopCfg.npcPos.y, shopCfg.npcPos.z - 1.0, shopCfg.npcHeading, false, true, true, true)
-    Citizen.InvokeNative(0x283978A15512B2FE, shopCfg.NPC, true) -- SetRandomOutfitVariation
-    SetEntityCanBeDamaged(shopCfg.NPC, false)
-    SetEntityInvincible(shopCfg.NPC, true)
+function AddNPC(site)
+    local siteCfg = Config.shops[site]
+    LoadModel(siteCfg.npc.model)
+    siteCfg.NPC = CreatePed(siteCfg.npc.model, siteCfg.npc.coords.x, siteCfg.npc.coords.y, siteCfg.npc.coords.z - 1.0, siteCfg.npc.heading, false, true, true, true)
+    Citizen.InvokeNative(0x283978A15512B2FE, siteCfg.NPC, true) -- SetRandomOutfitVariation
+    SetEntityCanBeDamaged(siteCfg.NPC, false)
+    SetEntityInvincible(siteCfg.NPC, true)
     Wait(500)
-    FreezeEntityPosition(shopCfg.NPC, true)
-    SetBlockingOfNonTemporaryEvents(shopCfg.NPC, true)
+    FreezeEntityPosition(siteCfg.NPC, true)
+    SetBlockingOfNonTemporaryEvents(siteCfg.NPC, true)
 end
 
 function LoadModel(npcModel)
@@ -770,14 +848,14 @@ AddEventHandler('onResourceStop', function(resourceName)
         MyWagon = nil
     end
 
-    for _, shopCfg in pairs(Config.shops) do
-        if shopCfg.Blip then
-            RemoveBlip(shopCfg.Blip)
-            shopCfg.Blip = nil
+    for _, siteCfg in pairs(Config.shops) do
+        if siteCfg.Blip then
+            RemoveBlip(siteCfg.Blip)
+            siteCfg.Blip = nil
         end
-        if shopCfg.NPC then
-            DeleteEntity(shopCfg.NPC)
-            shopCfg.NPC = nil
+        if siteCfg.NPC then
+            DeleteEntity(siteCfg.NPC)
+            siteCfg.NPC = nil
         end
     end
 end)

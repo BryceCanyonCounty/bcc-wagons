@@ -17,9 +17,10 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Wagons can be returned at any shop location via prompt
 - Return your wagon when afield by using the target menu
 - Give your wagon a special name at purchase time (rename wagon using the menu)
-- Set a max number of wagons per player in the config
+- Set a max number of wagons per player and wainwrights in the main config
 - Distance-based NPC spawns
 - Trade wagons with other players using target-menu
+- Limit individual wagon purchases to a specified job
 - Wainwright job can sell wagons to players (more to come!)
 
 
@@ -31,10 +32,11 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 
 - [vorp_core](https://github.com/VORPCORE/vorp-core-lua)
 - [vorp_inventory](https://github.com/VORPCORE/vorp_inventory-lua)
+- [bcc-utils](https://github.com/BryceCanyonCounty/bcc-utils)
 
 ## Installation
 
-- Ensure that the dependancies are added and started
+- Make sure dependencies are installed/updated and ensured before this script
 - Add `bcc-wagons` folder to your resources folder
 - Add `ensure bcc-wagons` to your `resources.cfg`
 - Run the included database file `wagons.sql`

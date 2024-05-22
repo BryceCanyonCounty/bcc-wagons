@@ -123,8 +123,8 @@ VORPcore.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data, 
             MySQL.query.await('DELETE FROM `player_wagons` WHERE `charid` = ? AND `id` = ?', { charid, id })
         end
     end
-    for _, wagonModels in pairs(Config.shops[site].wagons) do
-        for model, wagonConfig in pairs(wagonModels['types']) do
+    for _, wagonModels in pairs(Wagons) do
+        for model, wagonConfig in pairs(wagonModels.types) do
             if model == modelWagon then
                 local sellPrice = (Config.sellPrice * wagonConfig.cashPrice)
                 Character.addCurrency(0, sellPrice)
@@ -149,7 +149,7 @@ VORPcore.Callback.Register('bcc-wagons:SaveWagonTrade', function(source, cb, ser
     local jobGrade = newOwner.jobGrade
 
     local isWainwright = false
-    isWainwright = JobCheck(charJob, jobGrade, Config.wainwrightJob)
+    isWainwright = CheckPlayerJob(charJob, jobGrade, Config.wainwrightJob)
     local maxWagons = Config.maxPlayerWagons
     if isWainwright then
         maxWagons = Config.maxWainwrightWagons
@@ -169,21 +169,23 @@ VORPcore.Callback.Register('bcc-wagons:SaveWagonTrade', function(source, cb, ser
 end)
 
 RegisterServerEvent('bcc-wagons:RegisterInventory', function(id, wagonModel)
-    for model, invConfig in pairs(Config.inventory) do
-        if model == wagonModel then
-            local data = {
-                id = 'wagon_' .. tostring(id),
-                name = _U('wagonInv'),
-                limit = tonumber(invConfig.slots),
-                acceptWeapons = true,
-                shared = false,
-                ignoreItemStackLimit = true,
-                whitelistItems = false,
-                UsePermissions = false,
-                UseBlackList = false,
-                whitelistWeapons = false
-            }
-            exports.vorp_inventory:registerInventory(data)
+    for _, wagonModels in pairs(Wagons) do
+        for model, wagonConfig in pairs(wagonModels.types) do
+            if model == wagonModel then
+                local data = {
+                    id = 'wagon_' .. tostring(id),
+                    name = _U('wagonInv'),
+                    limit = tonumber(wagonConfig.invLimit),
+                    acceptWeapons = Config.inventory.weapons,
+                    shared = Config.inventory.shared,
+                    ignoreItemStackLimit = true,
+                    whitelistItems = false,
+                    UsePermissions = false,
+                    UseBlackList = false,
+                    whitelistWeapons = false
+                }
+                exports.vorp_inventory:registerInventory(data)
+            end
         end
     end
 end)
@@ -206,18 +208,18 @@ VORPcore.Callback.Register('bcc-wagons:CheckJob', function(source, cb, wainwrigh
     if wainwright then
         jobConfig = Config.wainwrightJob
     else
-        jobConfig = Config.shops[site].shop.jobs
+        jobConfig = Sites[site].shop.jobs
     end
     local hasJob = false
-    hasJob = JobCheck(charJob, jobGrade, jobConfig)
+    hasJob = CheckPlayerJob(charJob, jobGrade, jobConfig)
     if hasJob then
-        cb(true)
+        cb({true, charJob})
     else
-        cb(false)
+        cb({false, charJob})
     end
 end)
 
-function JobCheck(charJob, jobGrade, jobConfig)
+function CheckPlayerJob(charJob, jobGrade, jobConfig)
     for _, job in pairs(jobConfig) do
         if (charJob == job.name) and (tonumber(jobGrade) >= tonumber(job.grade)) then
             return true

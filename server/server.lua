@@ -109,7 +109,7 @@ RegisterNetEvent('bcc-wagons:GetMyWagons', function()
     TriggerClientEvent('bcc-wagons:WagonsData', src, wagons)
 end)
 
-VORPcore.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data, site)
+VORPcore.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data)
     local src = source
     local Character = VORPcore.getUser(src).getUsedCharacter
     local charid = Character.charIdentifier

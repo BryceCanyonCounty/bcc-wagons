@@ -19,6 +19,7 @@ Config.keys = {
     targetRet   = 0x760A9C6F, -- [G] Target Menu Wagon Return
     targetTrade = 0x620A6C5E, -- [V] Target Menu Start Wagon Trade
     trade       = 0x27D1C284, -- [R] Complete Wagon Trade
+    loot        = 0x760A9C6F, -- [G] Loot Wagon
 }
 -----------------------------------------------------
 
@@ -71,7 +72,7 @@ Config.wainwrightJob = {
 
 Config.inventory = {
     distance = 3,     -- Default: 3 / Distance from Wagon to Allow Inventory Access
-    shared   = false, -- Default: false / Set to true to Share with ALL Players
+    shared   = false, -- Default: false / Set to true to Share with ALL Players (Allows Looting)
     weapons  = true   -- Default: true / Allow Weapons in Inventory
 }
 

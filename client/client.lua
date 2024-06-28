@@ -4,6 +4,8 @@ local OpenShops, OpenReturn
 local PromptGroup = GetRandomIntInRange(0, 0xffffff)
 local TradeWagon
 local TradeGroup = GetRandomIntInRange(0, 0xffffff)
+local LootWagon
+local LootGroup = GetRandomIntInRange(0, 0xffffff)
 local TargetReturn, TargetTrade = nil, nil
 local PromptsStarted = false
 -- Wagons
@@ -283,20 +285,63 @@ function SpawnWagon(wagonModel, name, menuSpawn, id)
         SetModelAsNoLongerNeeded(model)
     end
 
+    Citizen.InvokeNative(0xD0E02AA618020D17, PlayerId(), MyWagon) -- SetPlayerOwnsVehicle
+    Citizen.InvokeNative(0xE2487779957FE897, MyWagon, 528) -- SetTransportUsageFlags
+
     MyWagonId = id
     TriggerServerEvent('bcc-wagons:RegisterInventory', MyWagonId, wagonModel)
+
+    if Config.inventory.shared then
+        Entity(MyWagon).state:set('myWagonId', MyWagonId, true)
+    end
 
     if Config.wagonTag then
         TriggerEvent('bcc-wagons:WagonTag')
     end
+
     if Config.wagonBlip then
         TriggerEvent('bcc-wagons:WagonBlip')
     end
+
     if Config.returnEnabled then
         TriggerEvent('bcc-wagons:WagonTarget')
     end
+
     TriggerEvent('bcc-wagons:WagonActions')
 end
+
+-- Loot Players Wagon Inventory
+CreateThread(function()
+    if Config.inventory.shared then
+        while true do
+            local vehicle, wagonId, owner = nil, nil, nil
+            local isWagon = false
+            local playerPed = PlayerPedId()
+            local coords = (GetEntityCoords(playerPed))
+            local sleep = 1000
+
+            if (IsEntityDead(playerPed)) or (not IsPedOnFoot(playerPed)) then goto END end
+
+            vehicle = Citizen.InvokeNative(0x52F45D033645181B, coords.x, coords.y, coords.z, 3.0, 0, 70, Citizen.ResultAsInteger()) -- GetClosestVehicle
+            if (vehicle == 0) or (vehicle == MyWagon) then goto END end
+
+            isWagon = Citizen.InvokeNative(0xEA44E97849E9F3DD, vehicle) -- IsDraftVehicle
+            if not isWagon then goto END end
+
+            owner = Citizen.InvokeNative(0x7C803BDC8343228D, vehicle) -- GetPlayerOwnerOfVehicle
+            if owner == 255 then goto END end
+
+            sleep = 0
+            PromptSetActiveGroupThisFrame(LootGroup, CreateVarString(10, 'LITERAL_STRING', _U('lootInventory')), 1, 0, 0, 0)
+            if Citizen.InvokeNative(0xC92AC953F0A982AE, LootWagon) then  -- PromptHasStandardModeCompleted
+                wagonId = Entity(vehicle).state.myWagonId
+                TriggerServerEvent('bcc-wagons:OpenInventory', wagonId)
+            end
+            ::END::
+            Wait(sleep)
+        end
+    end
+end)
 
 -- Set Wagon Name Above Wagon
 AddEventHandler('bcc-wagons:WagonTag', function()
@@ -342,7 +387,7 @@ RegisterNUICallback('SellWagon', function(data, cb)
     cb('ok')
     DeleteEntity(MyEntity)
     Cam = false
-    local wagonSold = VORPcore.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data, Site)
+    local wagonSold = VORPcore.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data)
     if wagonSold then
         WagonMenu()
     end
@@ -608,7 +653,7 @@ RegisterCommand(Config.commands.wagonEnter, function()
     else
         VORPcore.NotifyRightTip(_U('noWagon'), 4000)
     end
-end, false)
+end)
 
 RegisterCommand(Config.commands.wagonReturn, function()
     if Config.returnEnabled then
@@ -624,7 +669,7 @@ function StartPrompts()
     PromptSetText(OpenShops, CreateVarString(10, 'LITERAL_STRING', _U('shopPrompt')))
     PromptSetVisible(OpenShops, true)
     PromptSetStandardMode(OpenShops, true)
-    PromptSetGroup(OpenShops, PromptGroup)
+    PromptSetGroup(OpenShops, PromptGroup, 0)
     PromptRegisterEnd(OpenShops)
 
     OpenReturn = PromptRegisterBegin()
@@ -632,7 +677,7 @@ function StartPrompts()
     PromptSetText(OpenReturn, CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt')))
     PromptSetVisible(OpenReturn, true)
     PromptSetStandardMode(OpenReturn, true)
-    PromptSetGroup(OpenReturn, PromptGroup)
+    PromptSetGroup(OpenReturn, PromptGroup, 0)
     PromptRegisterEnd(OpenReturn)
 
     TradeWagon = PromptRegisterBegin()
@@ -640,8 +685,17 @@ function StartPrompts()
     PromptSetText(TradeWagon, CreateVarString(10, 'LITERAL_STRING', _U('tradePrompt')))
     PromptSetVisible(TradeWagon, true)
     PromptSetHoldMode(TradeWagon, 2000)
-    PromptSetGroup(TradeWagon, TradeGroup)
+    PromptSetGroup(TradeWagon, TradeGroup, 0)
     PromptRegisterEnd(TradeWagon)
+
+    LootWagon = PromptRegisterBegin()
+    PromptSetControlAction(LootWagon, Config.keys.loot)
+    PromptSetText(LootWagon, CreateVarString(10, 'LITERAL_STRING', _U('lootWagonPrompt')))
+    PromptSetVisible(LootWagon, true)
+    PromptSetEnabled(LootWagon, true)
+    PromptSetStandardMode(LootWagon)
+    PromptSetGroup(LootWagon, LootGroup, 0)
+    PromptRegisterEnd(LootWagon)
 end
 
 AddEventHandler('bcc-wagons:TargetPrompts', function(wagonGroup)

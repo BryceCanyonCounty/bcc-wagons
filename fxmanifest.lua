@@ -34,4 +34,4 @@ files {
     "ui/dist/style.css"
 }
 
-version '1.1.1'
+version '1.1.2'

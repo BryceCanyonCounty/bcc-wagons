@@ -22,6 +22,7 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Trade wagons with other players using target-menu
 - Limit individual wagon purchases to a specified job
 - Wainwright job can sell wagons to players (more to come!)
+- Shared inventory option. Allows wagon inventories to be looted when wagon is empty of players.
 
 
 ## Commands

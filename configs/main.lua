@@ -30,6 +30,12 @@ Config.commands = {
 }
 -----------------------------------------------------
 
+-- Discord webhooks
+Config.Webhook = ''  --place your webhook url
+Config.WebhookTitle = 'BCC-Wagons'
+Config.WebhookAvatar = ''
+-----------------------------------------------------
+
 -- Sell Price is 60% of cashPrice (shown below)
 Config.sellPrice = 0.60 -- Default: 0.60
 -----------------------------------------------------

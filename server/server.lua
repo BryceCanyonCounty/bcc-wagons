@@ -1,4 +1,7 @@
 local VORPcore = exports.vorp_core:GetCore()
+local BccUtils = exports['bcc-utils'].initiate()
+
+local discord = BccUtils.Discord.setup(Config.Webhook, Config.WebhookTitle, Config.WebhookAvatar)
 
 VORPcore.Callback.Register('bcc-wagons:BuyWagon', function(source, cb, data)
     local src = source
@@ -39,11 +42,15 @@ VORPcore.Callback.Register('bcc-wagons:SaveNewWagon', function(source, cb, wagon
 
     MySQL.query.await('INSERT INTO `player_wagons` (identifier, charid, name, model) VALUES (?, ?, ?, ?)',
         { identifier, charid, wagonInfo.name, wagonInfo.wagonData.ModelW })
+
     if wagonInfo.wagonData.IsCash then
         Character.removeCurrency(0, wagonInfo.wagonData.Cash)
+		discord:sendMessage("Name: " .. Character.firstname .. " " .. Character.lastname .. "\nIdentifier: " .. Character.identifier .. "\nWagon Name: " .. wagonInfo.name .. "\nWagon Model: " .. wagonInfo.wagonData.ModelW .. "\nFor cash: $" .. wagonInfo.wagonData.Cash)
     else
         Character.removeCurrency(1, wagonInfo.wagonData.Gold)
+        discord:sendMessage("Name: " .. Character.firstname .. " " .. Character.lastname .. "\nIdentifier: " .. Character.identifier .. "\nWagon Name: " .. wagonInfo.name .. "\nWagon Model: " .. wagonInfo.wagonData.ModelW .. "\nFor Gold: " .. wagonInfo.wagonData.Gold)
     end
+
     cb(true)
 end)
 
@@ -127,12 +134,16 @@ VORPcore.Callback.Register('bcc-wagons:SellMyWagon', function(source, cb, data)
         for model, wagonConfig in pairs(wagonModels.types) do
             if model == modelWagon then
                 local sellPrice = (Config.sellPrice * wagonConfig.cashPrice)
+                sellPrice = math.floor(sellPrice)  -- Round to the nearest whole number
                 Character.addCurrency(0, sellPrice)
+                discord:sendMessage("Name: " .. Character.firstname .. " " .. Character.lastname .. "\nIdentifier: " .. Character.identifier .. "\nWagon Name: " .. data.WagonName .. "\nWagon Model: " .. data.WagonModel .. "\nSold for: $" .. sellPrice)
                 VORPcore.NotifyRightTip(src, _U('soldWagon') .. data.WagonName .. _U('frcash') .. sellPrice, 4000)
                 cb(true)
+                return  -- Ensure callback is called once
             end
         end
     end
+    cb(false)  -- Call callback with false if wagon not found or not sold
 end)
 
 VORPcore.Callback.Register('bcc-wagons:SaveWagonTrade', function(source, cb, serverId, wagonId)
@@ -162,7 +173,7 @@ VORPcore.Callback.Register('bcc-wagons:SaveWagonTrade', function(source, cb, ser
     end
 
     MySQL.query.await('UPDATE `player_wagons` SET `identifier` = ?, `charid` = ?, `selected` = ? WHERE `id` = ?', { newOwnerId, newOwnerCharId, 0, wagonId })
-
+    discord:sendMessage("Current Owner: " .. curOwnerName .. "\nIdentifier: " .. curOwner.identifier .. "\nGave a wagon to: " .. "\nNew Owner: " .. newOwnerName .. "\nIdentifier: " .. newOwnerId)
     VORPcore.NotifyRightTip(src, _U('youGave') .. newOwnerName .. _U('aWagon'), 4000)
     VORPcore.NotifyRightTip(serverId, curOwnerName .._U('gaveWagon'), 4000)
     cb(true)
@@ -213,9 +224,9 @@ VORPcore.Callback.Register('bcc-wagons:CheckJob', function(source, cb, wainwrigh
     local hasJob = false
     hasJob = CheckPlayerJob(charJob, jobGrade, jobConfig)
     if hasJob then
-        cb({true, charJob})
+        cb({ true, charJob })
     else
-        cb({false, charJob})
+        cb({ false, charJob })
     end
 end)
 

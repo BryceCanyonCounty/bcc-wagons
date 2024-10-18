@@ -12,14 +12,14 @@ Config.currencyType = 2 -- Default: 2
 -----------------------------------------------------
 
 Config.keys = {
-    shop        = 0x760A9C6F, -- [G] Open Wagon Shop Menu
-    ret         = 0xD9D0E1C0, -- [spacebar] Return Wagon at Shop
-    call        = 0xF3830D8E, -- [J] Call Selected Wagon
-    inv         = 0xD8F73058, -- [U] Open Wagon Inventory
-    targetRet   = 0x760A9C6F, -- [G] Target Menu Wagon Return
-    targetTrade = 0x620A6C5E, -- [V] Target Menu Start Wagon Trade
-    trade       = 0x27D1C284, -- [R] Complete Wagon Trade
-    loot        = 0x760A9C6F, -- [G] Loot Wagon
+    shop   = 0x760A9C6F, -- [G] Open Wagon Shop Menu
+    ret    = 0xD9D0E1C0, -- [spacebar] Return Wagon at Shop
+    call   = 0xF3830D8E, -- [J] Call Selected Wagon
+    trade  = 0x27D1C284, -- [R] Complete Wagon Trade
+    loot   = 0x760A9C6F, -- [G] Loot Wagon
+    menu   = 0x63A0D258, -- [G] Open Wagon Menu
+    action = 0x760A9C6F, -- [G] Open Wagon Menu Off Wagon
+    brake  = 0xF1301666, -- [O] Set Brake
 }
 -----------------------------------------------------
 
@@ -31,13 +31,18 @@ Config.commands = {
 -----------------------------------------------------
 
 -- Discord webhooks
-Config.Webhook = ''  --place your webhook url
+Config.Webhook = '' --place your webhook url
 Config.WebhookTitle = 'BCC-Wagons'
 Config.WebhookAvatar = ''
 -----------------------------------------------------
 
--- Sell Price is 60% of cashPrice (shown below)
-Config.sellPrice = 0.60 -- Default: 0.60
+-- 1 = Miles per Hour (MPH)
+-- 2 = Kilometers per Hour (KPH)
+Config.speed = 1 -- Default: 1
+-----------------------------------------------------
+
+-- Sell Price is 70% of cashPrice (shown below)
+Config.sellPrice = 0.70 -- Default: 0.70
 -----------------------------------------------------
 
 -- Max Number of Wagons per Player
@@ -45,24 +50,18 @@ Config.maxPlayerWagons = 5      -- Default: 5
 Config.maxWainwrightWagons = 10 -- Default: 10
 -----------------------------------------------------
 
+-- Translate Label Only
+Config.repair = {
+    item = 'bcc_repair_hammer', -- Default: 'bcc_repair_hammer' / Item Name in Database for Repair Item
+    label = 'Repair Hammer',    -- Default: 'Repair Hammer' / Item Label for Repair Item
+    usage = 1                   -- Default: 1 / Durability Value Removed from item per Use
+}
+-----------------------------------------------------
+
 -- Players Can Remote Call and Return Their Wagon
-Config.callEnabled = true -- Default: true / Set to false to Spawn Wagon from Menu Only
+Config.callEnabled = true   -- Default: true / Set to false to Spawn Wagon from Menu Only
 Config.returnEnabled = true -- Defauly: true / Set to false to Return at Wagon Dealer Only
-Config.callDist = 100 -- Default: 100 / Distance from Wagon to Call for Respawn
------------------------------------------------------
-
--- Places Wagon Name Above Wagon When Wagon is Empty
-Config.wagonTag = true --Default: true / Set to false to disable
-Config.tagDistance = 15 -- Default: 15 / Distance from Wagon to Show Tag
------------------------------------------------------
-
--- Set a Blip on your Spawned Wagon
-Config.wagonBlip = true --Default: true / Set to false to disable
-Config.wagonBlipSprite = 'blip_mp_player_wagon' -- Default: 'blip_mp_player_wagon'
------------------------------------------------------
-
--- Distance from Wagon to Allow Target Prompts(right-click)
-Config.targetDist = 5 -- Default: 5
+Config.callDist = 100       -- Default: 100 / Distance from Wagon to Call for Respawn
 -----------------------------------------------------
 
 -- Set Player in Wagon on Spawn from Menu
@@ -74,14 +73,6 @@ Config.wainwrightOnly = false -- *Not Currently Used*
 Config.wainwrightJob = {
     { name = 'wainwright', grade = 0 },
 }
------------------------------------------------------
-
-Config.inventory = {
-    distance = 3,     -- Default: 3 / Distance from Wagon to Allow Inventory Access
-    shared   = false, -- Default: false / Set to true to Share with ALL Players (Allows Looting)
-    weapons  = true   -- Default: true / Allow Weapons in Inventory
-}
-
 -----------------------------------------------------
 
 Config.BlipColors = {

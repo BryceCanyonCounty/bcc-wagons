@@ -15,15 +15,18 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 - Blips can change color reflecting if shop is open, closed or job locked
 - Shop access can be limited by job and jobgrade
 - Wagons can be returned at any shop location via prompt
-- Return your wagon when afield by using the target menu
+- Return your wagon when afield by using the menu
 - Give your wagon a special name at purchase time (rename wagon using the menu)
 - Set a max number of wagons per player and wainwrights in the main config
 - Distance-based NPC spawns
-- Trade wagons with other players using target-menu
+- Trade wagons with other players using the menu
 - Limit individual wagon purchases to a specified job
 - Wainwright job can sell wagons to players (more to come!)
-- Shared inventory option. Allows wagon inventories to be looted when wagon is empty of players.
-
+- Shared inventory option. Allows wagon inventories to be looted when wagon is empty of players
+- Wagon condition reduces while the wagon is spawned
+  - Repair your wagon with the repair item (default: hammer / set in config)
+  - Repair item can be used to repair both wagons and boats (if using bcc-boats)
+  - Durability of repair item reduces with each use
 
 ## Commands
 - Command `/wagonEnter` if you have trouble getting to your wagon

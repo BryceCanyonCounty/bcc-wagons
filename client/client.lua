@@ -1,22 +1,25 @@
-local VORPcore = exports.vorp_core:GetCore()
+Core = exports.vorp_core:GetCore()
 -- Prompts
-local OpenShops, OpenReturn
-local PromptGroup = GetRandomIntInRange(0, 0xffffff)
-local TradeWagon
+local ShopPrompt, ReturnPrompt
+local ShopGroup = GetRandomIntInRange(0, 0xffffff)
+local TradePrompt
 local TradeGroup = GetRandomIntInRange(0, 0xffffff)
-local LootWagon
+local LootPrompt
 local LootGroup = GetRandomIntInRange(0, 0xffffff)
-local TargetReturn, TargetTrade = nil, nil
+local WagonMenuPrompt, BrakePrompt
+local WagonGroup = GetRandomIntInRange(0, 0xffffff)
+local ActionPrompt
+local ActionGroup = GetRandomIntInRange(0, 0xffffff)
 local PromptsStarted = false
 -- Wagons
-local ShopName, ShopEntity, Site
-local MyEntity, MyWagonId, MyWagonName
-local MyWagon = nil
+local MyEntity, ShopName, ShopEntity, Site, Speed, Format
 local InMenu = false
 local Cam = false
 local HasJob = false
 local IsWainwright = false
-local Trading = false
+MyWagon, MyWagonId, MyWagonName, MyWagonModel = 0, nil, nil, nil
+WagonCfg, RepairLevel = {}, 0
+IsWagonDamaged, IsBrakeSet, Trading = false, false, false
 
 CreateThread(function()
     StartPrompts()
@@ -37,10 +40,10 @@ CreateThread(function()
                 RemoveNPC(site)
                 if distance <= siteCfg.shop.distance then
                     sleep = 0
-                    PromptSetActiveGroupThisFrame(PromptGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.name .. _U('hours') ..
+                    PromptSetActiveGroupThisFrame(ShopGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.name .. _U('hours') ..
                     siteCfg.shop.hours.open .. _U('to') .. siteCfg.shop.hours.close .. _U('hundred')))
-                    PromptSetEnabled(OpenShops, false)
-                    PromptSetEnabled(OpenReturn, false)
+                    PromptSetEnabled(ShopPrompt, false)
+                    PromptSetEnabled(ReturnPrompt, false)
                 end
 
             -- Shop Open
@@ -55,17 +58,17 @@ CreateThread(function()
                 end
                 if distance <= siteCfg.shop.distance then
                     sleep = 0
-                    PromptSetActiveGroupThisFrame(PromptGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.prompt))
-                    PromptSetEnabled(OpenShops, true)
-                    PromptSetEnabled(OpenReturn, true)
+                    PromptSetActiveGroupThisFrame(ShopGroup, CreateVarString(10, 'LITERAL_STRING', siteCfg.shop.prompt))
+                    PromptSetEnabled(ShopPrompt, true)
+                    PromptSetEnabled(ReturnPrompt, true)
 
-                    if Citizen.InvokeNative(0xC92AC953F0A982AE, OpenShops) then -- UiPromptHasStandardModeCompleted
+                    if Citizen.InvokeNative(0xC92AC953F0A982AE, ShopPrompt) then -- UiPromptHasStandardModeCompleted
                         CheckPlayerJob(false, site)
                         if siteCfg.shop.jobsEnabled then
                             if not HasJob then goto END end
                         end
                         OpenMenu(site)
-                    elseif Citizen.InvokeNative(0xC92AC953F0A982AE, OpenReturn) then -- UiPromptHasStandardModeCompleted
+                    elseif Citizen.InvokeNative(0xC92AC953F0A982AE, ReturnPrompt) then -- UiPromptHasStandardModeCompleted
                         if siteCfg.shop.jobsEnabled then
                             CheckPlayerJob(false, site)
                             if not HasJob then goto END end
@@ -113,8 +116,14 @@ RegisterNUICallback('LoadWagon', function(data, cb)
         MyEntity = nil
     end
 
-    local model = joaat(data.WagonModel)
-    LoadWagonModel(model, data.WagonModel)
+    local model = data.WagonModel
+    local hash = joaat(model)
+    LoadModel(hash, model)
+
+    -- local seats = Citizen.InvokeNative(0x9A578736FF3A17C3, hash) -- GetVehicleModelNumberOfSeats
+    -- if seats >= 1 then
+    --     Core.NotifyRightTip('Seats: ' .. tostring(seats), 4000)
+    -- end
 
     if ShopEntity then
         DeleteEntity(ShopEntity)
@@ -122,21 +131,27 @@ RegisterNUICallback('LoadWagon', function(data, cb)
     end
 
     local siteCfg = Sites[Site]
-    ShopEntity = CreateVehicle(model, siteCfg.wagon.coords, siteCfg.wagon.heading, false, false, false, false)
+    ShopEntity = CreateVehicle(hash, siteCfg.wagon.coords, siteCfg.wagon.heading, false, false, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, ShopEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, ShopEntity, true) -- FreezeEntityPosition
-    SetModelAsNoLongerNeeded(model)
+    SetModelAsNoLongerNeeded(hash)
     if not Cam then
         Cam = true
         CameraLighting()
     end
+
+    -- local passengers = Citizen.InvokeNative(0xA9C55F1C15E62E06, ShopEntity) -- GetVehicleMaxNumberOfPassengers
+    -- if passengers >= 1 then
+    --     Core.NotifyRightTip('Passengers: ' .. tostring(passengers), 4000)
+    -- end
+
 end)
 
 RegisterNUICallback('BuyWagon', function(data, cb)
     cb('ok')
     CheckPlayerJob(true)
     if Sites[Site].wainwrightBuy and not IsWainwright then
-        VORPcore.NotifyRightTip(_U('wainwrightBuyWagon'), 4000)
+        Core.NotifyRightTip(_U('wainwrightBuyWagon'), 4000)
         WagonMenu()
         return
     end
@@ -145,7 +160,7 @@ RegisterNUICallback('BuyWagon', function(data, cb)
     else
         data.isWainwright = false
     end
-    local canBuy = VORPcore.Callback.TriggerAwait('bcc-wagons:BuyWagon', data)
+    local canBuy = Core.Callback.TriggerAwait('bcc-wagons:BuyWagon', data)
     if canBuy then
         SetWagonName(data, false)
     else
@@ -172,13 +187,13 @@ function SetWagonName(data, rename)
             if string.len(wagonName) > 0 then
                 local wagonInfo = {wagonData = data, name = wagonName}
                 if rename then
-                    local nameSaved = VORPcore.Callback.TriggerAwait('bcc-wagons:UpdateWagonName', wagonInfo)
+                    local nameSaved = Core.Callback.TriggerAwait('bcc-wagons:UpdateWagonName', wagonInfo)
                     if nameSaved then
                         WagonMenu()
                     end
                     return
                 else
-                    local wagonSaved = VORPcore.Callback.TriggerAwait('bcc-wagons:SaveNewWagon', wagonInfo)
+                    local wagonSaved = Core.Callback.TriggerAwait('bcc-wagons:SaveNewWagon', wagonInfo)
                     if wagonSaved then
                         WagonMenu()
                     end
@@ -212,8 +227,9 @@ RegisterNUICallback('LoadMyWagon', function(data, cb)
         ShopEntity = nil
     end
 
-    local model = joaat(data.WagonModel)
-    LoadWagonModel(model, data.WagonModel)
+    local model = data.WagonModel
+    local hash = joaat(model)
+    LoadModel(hash, model)
 
     if MyEntity then
         DeleteEntity(MyEntity)
@@ -221,10 +237,10 @@ RegisterNUICallback('LoadMyWagon', function(data, cb)
     end
 
     local siteCfg = Sites[Site]
-    MyEntity = CreateVehicle(model, siteCfg.wagon.coords, siteCfg.wagon.heading, false, false, false, false)
+    MyEntity = CreateVehicle(hash, siteCfg.wagon.coords, siteCfg.wagon.heading, false, false, false, false)
     Citizen.InvokeNative(0x7263332501E07F52, MyEntity, true) -- SetVehicleOnGroundProperly
     Citizen.InvokeNative(0x7D9EFB7AD6B19754, MyEntity, true) -- FreezeEntityPosition
-    SetModelAsNoLongerNeeded(model)
+    SetModelAsNoLongerNeeded(hash)
     if not Cam then
         Cam = true
         CameraLighting()
@@ -237,10 +253,19 @@ RegisterNUICallback('SelectWagon', function(data, cb)
 end)
 
 function GetSelectedWagon()
-    local data = VORPcore.Callback.TriggerAwait('bcc-wagons:GetWagonData')
+    local data = Core.Callback.TriggerAwait('bcc-wagons:GetWagonData')
     if data then
         SpawnWagon(data.model, data.name, false, data.id)
     end
+end
+
+local function SetWagonDamaged()
+    if MyWagon == 0 then return end
+    IsWagonDamaged = true
+    Core.NotifyRightTip(_U('needRepairs'), 4000)
+    Citizen.InvokeNative(0x260BE8F09E326A20, MyWagon, 10.0, 2000, true) -- BringVehicleToHalt
+    IsBrakeSet = true
+    PromptSetText(BrakePrompt, CreateVarString(10, 'LITERAL_STRING', _U('brakeOff')))
 end
 
 RegisterNUICallback('SpawnInfo', function(data, cb)
@@ -248,17 +273,29 @@ RegisterNUICallback('SpawnInfo', function(data, cb)
     SpawnWagon(data.WagonModel, data.WagonName, true, data.WagonId)
 end)
 
-function SpawnWagon(wagonModel, name, menuSpawn, id)
+function SpawnWagon(wagonModel, wagonName, menuSpawn, wagonId)
     ResetWagon()
-    MyWagonName = name
-    local model = joaat(wagonModel)
-    LoadWagonModel(model, wagonModel)
+
+    for _, wagonModels in pairs(Wagons) do
+        for model, wagonConfig in pairs(wagonModels.types) do
+            if model == wagonModel then
+                WagonCfg = wagonConfig
+                break
+            end
+        end
+    end
+
+    MyWagonModel = wagonModel
+    MyWagonName = wagonName
+    MyWagonId = wagonId
+    local hash = joaat(wagonModel)
+    LoadModel(hash, wagonModel)
 
     if menuSpawn then
         local siteCfg = Sites[Site]
-        MyWagon = CreateVehicle(model, siteCfg.wagon.coords, siteCfg.wagon.heading, true, false, false, false)
+        MyWagon = CreateVehicle(hash, siteCfg.wagon.coords, siteCfg.wagon.heading, true, false, false, false)
         Citizen.InvokeNative(0x7263332501E07F52, MyWagon, true) -- SetVehicleOnGroundProperly
-        SetModelAsNoLongerNeeded(model)
+        SetModelAsNoLongerNeeded(hash)
         if Config.seated then
             DoScreenFadeOut(500)
             Wait(500)
@@ -280,75 +317,181 @@ function SpawnWagon(wagonModel, name, menuSpawn, id)
                 index = index + 3
             end
         end
-        MyWagon = CreateVehicle(model, node, heading, true, false, false, false)
+        MyWagon = CreateVehicle(hash, node, heading, true, false, false, false)
         Citizen.InvokeNative(0x7263332501E07F52, MyWagon, true) -- SetVehicleOnGroundProperly
-        SetModelAsNoLongerNeeded(model)
+        SetModelAsNoLongerNeeded(hash)
     end
 
     Citizen.InvokeNative(0xD0E02AA618020D17, PlayerId(), MyWagon) -- SetPlayerOwnsVehicle
     Citizen.InvokeNative(0xE2487779957FE897, MyWagon, 528) -- SetTransportUsageFlags
 
-    MyWagonId = id
-    TriggerServerEvent('bcc-wagons:RegisterInventory', MyWagonId, wagonModel)
-
-    if Config.inventory.shared then
-        Entity(MyWagon).state:set('myWagonId', MyWagonId, true)
+    if WagonCfg.inventory.enabled then
+        TriggerServerEvent('bcc-wagons:RegisterInventory', MyWagonId, wagonModel)
+        if WagonCfg.inventory.shared then
+            Entity(MyWagon).state:set('myWagonId', MyWagonId, true)
+        end
     end
 
-    if Config.wagonTag then
+    if WagonCfg.gamerTag.enabled then
         TriggerEvent('bcc-wagons:WagonTag')
     end
 
-    if Config.wagonBlip then
+    if WagonCfg.blip.enabled then
         TriggerEvent('bcc-wagons:WagonBlip')
     end
 
-    if Config.returnEnabled then
-        TriggerEvent('bcc-wagons:WagonTarget')
+    if WagonCfg.brakeSet then
+        Citizen.InvokeNative(0x260BE8F09E326A20, MyWagon, 0.0, 2000, true) -- BringVehicleToHalt
+        IsBrakeSet = true
     end
 
-    TriggerEvent('bcc-wagons:WagonActions')
+    if WagonCfg.condition.enabled then
+        RepairLevel = GetCondition()
+        if RepairLevel < WagonCfg.condition.decreaseValue then
+            SetWagonDamaged()
+        end
+        TriggerEvent('bcc-wagons:RepairMonitor')
+    end
+
+    TriggerEvent('bcc-wagons:SpeedMonitor')
+
+    TriggerEvent('bcc-wagons:WagonPrompts')
 end
 
 -- Loot Players Wagon Inventory
 CreateThread(function()
-    if Config.inventory.shared then
-        while true do
-            local vehicle, wagonId, owner = nil, nil, nil
-            local isWagon = false
-            local playerPed = PlayerPedId()
-            local coords = (GetEntityCoords(playerPed))
-            local sleep = 1000
+    while true do
+        local vehicle, wagonId, owner = nil, nil, nil
+        local isWagon = false
+        local playerPed = PlayerPedId()
+        local coords = (GetEntityCoords(playerPed))
+        local sleep = 1000
 
-            if (IsEntityDead(playerPed)) or (not IsPedOnFoot(playerPed)) then goto END end
+        if (IsEntityDead(playerPed)) or (not IsPedOnFoot(playerPed)) then goto END end
 
-            vehicle = Citizen.InvokeNative(0x52F45D033645181B, coords.x, coords.y, coords.z, 3.0, 0, 70, Citizen.ResultAsInteger()) -- GetClosestVehicle
-            if (vehicle == 0) or (vehicle == MyWagon) then goto END end
+        vehicle = Citizen.InvokeNative(0x52F45D033645181B, coords.x, coords.y, coords.z, 3.0, 0, 70, Citizen.ResultAsInteger()) -- GetClosestVehicle
+        if (vehicle == 0) or (vehicle == MyWagon) then goto END end
 
-            isWagon = Citizen.InvokeNative(0xEA44E97849E9F3DD, vehicle) -- IsDraftVehicle
-            if not isWagon then goto END end
+        isWagon = Citizen.InvokeNative(0xEA44E97849E9F3DD, vehicle) -- IsDraftVehicle
+        if not isWagon then goto END end
 
-            owner = Citizen.InvokeNative(0x7C803BDC8343228D, vehicle) -- GetPlayerOwnerOfVehicle
-            if owner == 255 then goto END end
+        owner = Citizen.InvokeNative(0x7C803BDC8343228D, vehicle) -- GetPlayerOwnerOfVehicle
+        if owner == 255 then goto END end
 
-            sleep = 0
-            PromptSetActiveGroupThisFrame(LootGroup, CreateVarString(10, 'LITERAL_STRING', _U('lootInventory')), 1, 0, 0, 0)
-            if Citizen.InvokeNative(0xC92AC953F0A982AE, LootWagon) then  -- PromptHasStandardModeCompleted
-                wagonId = Entity(vehicle).state.myWagonId
-                TriggerServerEvent('bcc-wagons:OpenInventory', wagonId)
-            end
-            ::END::
-            Wait(sleep)
+        sleep = 0
+        PromptSetActiveGroupThisFrame(LootGroup, CreateVarString(10, 'LITERAL_STRING', _U('lootInventory')), 1, 0, 0, 0)
+        if Citizen.InvokeNative(0xC92AC953F0A982AE, LootPrompt) then  -- PromptHasStandardModeCompleted
+            wagonId = Entity(vehicle).state.myWagonId
+            TriggerServerEvent('bcc-wagons:OpenInventory', wagonId)
         end
+        ::END::
+        Wait(sleep)
+    end
+end)
+
+AddEventHandler('bcc-wagons:RepairMonitor', function()
+    local decreaseTime = (WagonCfg.condition.decreaseTime * 1000)
+    local decreaseValue = WagonCfg.condition.decreaseValue
+    if not IsWagonDamaged then
+        Wait(decreaseTime) -- Wait after spawning wagon
+    end
+    while MyWagon ~= 0 do
+        if RepairLevel >= decreaseValue then
+            IsWagonDamaged = false
+            local newLevel = Core.Callback.TriggerAwait('bcc-wagons:UpdateRepairLevel', MyWagonId, MyWagonModel)
+            if newLevel then
+                RepairLevel = newLevel
+            end
+        end
+        if IsWagonDamaged then goto END end
+        if RepairLevel < decreaseValue then
+            SetWagonDamaged()
+        end
+        ::END::
+        Wait(decreaseTime) -- Interval to decrease condition
+    end
+end)
+
+function GetCondition()
+    local condition = Core.Callback.TriggerAwait('bcc-wagons:GetRepairLevel', MyWagonId, MyWagonModel)
+    if condition then
+        return condition
+    elseif condition == nil then
+        return 0
+    end
+end
+
+AddEventHandler('bcc-wagons:SpeedMonitor', function()
+    local multiplier
+    if Config.speed == 1 then
+        multiplier = 2.23694 -- Meters per Second to Miles per Hour
+        Format = '~s~mph'
+    elseif Config.speed == 2 then
+        multiplier = 3.6 -- Meters per Second to Kilometers per Hour
+        Format = '~s~kph'
+    end
+
+    while MyWagon ~= 0 do
+        Wait(1000)
+        local entitySpeed = Citizen.InvokeNative(0xFB6BA510A533DF81, MyWagon, Citizen.ResultAsFloat()) -- GetEntitySpeed / Meters per Second
+        Speed = math.floor(entitySpeed * multiplier)
+    end
+end)
+
+AddEventHandler('bcc-wagons:WagonPrompts', function()
+    StartWagonPrompts()
+    local promptDist = WagonCfg.distance
+
+    while MyWagon ~= 0 do
+        local playerPed = PlayerPedId()
+        local distance = #(GetEntityCoords(playerPed) - GetEntityCoords(MyWagon))
+        local sleep = 1000
+
+        if distance > promptDist then goto END end
+
+        if IsPedInVehicle(playerPed, MyWagon, false) then
+            sleep = 0
+
+            local wagonStats = 'speed: ~o~' .. tostring(Speed) .. Format .. ' | condition: ~o~' .. tostring(RepairLevel)
+            PromptSetActiveGroupThisFrame(WagonGroup, CreateVarString(10, 'LITERAL_STRING', wagonStats), 1, 0, 0, 0)
+
+            if Citizen.InvokeNative(0xC92AC953F0A982AE, WagonMenuPrompt) then  -- PromptHasStandardModeCompleted
+                OpenWagonMenu()
+            end
+
+            if Citizen.InvokeNative(0xC92AC953F0A982AE, BrakePrompt) then  -- PromptHasStandardModeCompleted
+                if IsWagonDamaged then goto END end
+
+                if not IsBrakeSet then
+                    Citizen.InvokeNative(0x260BE8F09E326A20, MyWagon, 10.0, 2000, true) -- BringVehicleToHalt
+                    IsBrakeSet = true
+                    PromptSetText(BrakePrompt, CreateVarString(10, 'LITERAL_STRING', _U('brakeOff')))
+                else
+                    Citizen.InvokeNative(0x7C06330BFDDA182E, MyWagon) -- StopBringingVehicleToHalt
+                    IsBrakeSet = false
+                    PromptSetText(BrakePrompt, CreateVarString(10, 'LITERAL_STRING', _U('brakeOn')))
+                end
+            end
+
+        else
+            sleep = 0
+
+            PromptSetActiveGroupThisFrame(ActionGroup, CreateVarString(10, 'LITERAL_STRING', MyWagonName), 1, 0, 0, 0)
+            if Citizen.InvokeNative(0xC92AC953F0A982AE, ActionPrompt) then  -- PromptHasStandardModeCompleted
+                OpenWagonMenu()
+            end
+        end
+        ::END::
+        Wait(sleep)
     end
 end)
 
 -- Set Wagon Name Above Wagon
 AddEventHandler('bcc-wagons:WagonTag', function()
     local playerPed = PlayerPedId()
-    local tagDist = Config.tagDistance
+    local tagDist = WagonCfg.gamerTag.distance
     local gamerTagId = Citizen.InvokeNative(0xE961BF23EAB76B12, MyWagon, MyWagonName) -- CreateMpGamerTagOnEntity
-    while MyWagon do
+    while MyWagon ~= 0 do
         Wait(1000)
         local dist = #(GetEntityCoords(playerPed) - GetEntityCoords(MyWagon))
         if dist <= tagDist and not Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
@@ -366,7 +509,7 @@ end)
 AddEventHandler('bcc-wagons:WagonBlip', function()
     local playerPed = PlayerPedId()
     local wagonBlip
-    while MyWagon do
+    while MyWagon ~= 0 do
         Wait(1000)
         if Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
             if wagonBlip then
@@ -376,8 +519,8 @@ AddEventHandler('bcc-wagons:WagonBlip', function()
         else
             if not wagonBlip then
                 wagonBlip = Citizen.InvokeNative(0x23F74C2FDA6E7C61, -1749618580, MyWagon) -- BlipAddForEntity
-                SetBlipSprite(wagonBlip, joaat(Config.wagonBlipSprite), true)
-                Citizen.InvokeNative(0x9CB1A1623062F402, wagonBlip, MyWagonName) -- SetBlipNameFromPlayerString
+                SetBlipSprite(wagonBlip, joaat(WagonCfg.blip.sprite), true)
+                Citizen.InvokeNative(0x9CB1A1623062F402, wagonBlip, MyWagonName) -- SetBlipName
             end
         end
     end
@@ -387,7 +530,7 @@ RegisterNUICallback('SellWagon', function(data, cb)
     cb('ok')
     DeleteEntity(MyEntity)
     Cam = false
-    local wagonSold = VORPcore.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data)
+    local wagonSold = Core.Callback.TriggerAwait('bcc-wagons:SellMyWagon', data)
     if wagonSold then
         WagonMenu()
     end
@@ -441,12 +584,12 @@ CreateThread(function()
         while true do
             Wait(0)
             if Citizen.InvokeNative(0x580417101DDB492F, 2, callKey) then -- IsControlJustPressed
-                if MyWagon then
+                if MyWagon ~= 0 then
                     local dist = #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(MyWagon))
                     if dist >= Config.callDist then
                         GetSelectedWagon()
                     else
-                        VORPcore.NotifyRightTip(_U('tooClose'), 5000)
+                        Core.NotifyRightTip(_U('tooClose'), 5000)
                     end
                 else
                     GetSelectedWagon()
@@ -456,71 +599,24 @@ CreateThread(function()
     end
 end)
 
-AddEventHandler('bcc-wagons:WagonActions', function()
-    while MyWagon do
-        Wait(0)
-        -- Open Wagon Inventory
-        if Citizen.InvokeNative(0x580417101DDB492F, 2, Config.keys.inv) then -- IsControlJustPressed
-            local dist = #(GetEntityCoords(PlayerPedId()) - GetEntityCoords(MyWagon))
-            if dist <= Config.inventory.distance then
-                TriggerServerEvent('bcc-wagons:OpenInventory', MyWagonId)
-            end
-        end
-    end
-end)
-
 -- Return Wagon Using Prompt at Shop Location
 function ReturnWagon()
-    if MyWagon then
+    if MyWagon ~= 0 then
         ResetWagon()
-        VORPcore.NotifyRightTip(_U('wagonReturned'), 4000)
+        Core.NotifyRightTip(_U('wagonReturned'), 4000)
     else
-        VORPcore.NotifyRightTip(_U('noWagonReturn'), 4000)
+        Core.NotifyRightTip(_U('noWagonReturn'), 4000)
     end
 end
-
-AddEventHandler('bcc-wagons:WagonTarget', function()
-    local playerPed = PlayerPedId()
-    local player = PlayerId()
-    local targetDist = Config.targetDist
-    while MyWagon do
-        local sleep = 1000
-        local dist = #(GetEntityCoords(playerPed) - GetEntityCoords(MyWagon))
-        if dist > targetDist or Citizen.InvokeNative(0xEC5F66E459AF3BB2, playerPed, MyWagon) then -- IsPedOnSpecificVehicle
-            Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, false) -- SetVehicleCanBeTargetted
-            goto END
-        end
-        Citizen.InvokeNative(0x05254BA0B44ADC16, MyWagon, true) -- SetVehicleCanBeTargetted
-        if Citizen.InvokeNative(0x27F89FDC16688A7A, player, MyWagon, 0) then -- IsPlayerTargettingEntity
-            sleep = 0
-            local wagonGroup = Citizen.InvokeNative(0xB796970BD125FCE8, MyWagon) -- PromptGetGroupIdForTargetEntity
-            TriggerEvent('bcc-wagons:TargetPrompts', wagonGroup)
-
-            if Citizen.InvokeNative(0x580417101DDB492F, 0, Config.keys.targetRet) then -- IsControlJustPressed
-                DoScreenFadeOut(500)
-                Wait(500)
-                ResetWagon()
-                Wait(500)
-                DoScreenFadeIn(500)
-
-            elseif Citizen.InvokeNative(0x580417101DDB492F, 0, Config.keys.targetTrade) then -- IsControlJustPressed
-                VORPcore.NotifyRightTip(_U('readyToTrade'), 4000)
-                Trading = true
-                TriggerEvent('bcc-wagons:TradeWagon')
-            end
-        end
-        ::END::
-        Wait(sleep)
-    end
-end)
 
 AddEventHandler('bcc-wagons:TradeWagon', function()
     while Trading do
         local playerPed = PlayerPedId()
         local sleep = 1000
 
-        if IsEntityDead(playerPed) then
+        if IsEntityDead(playerPed) or IsPedOnSpecificVehicle(playerPed, MyWagon) then
             Trading = false
+            PromptDelete(TradePrompt)
             break
         end
 
@@ -528,14 +624,14 @@ AddEventHandler('bcc-wagons:TradeWagon', function()
         if closestPlayer and closestDistance <= 2.0 then
             sleep = 0
             PromptSetActiveGroupThisFrame(TradeGroup, CreateVarString(10, 'LITERAL_STRING', MyWagonName))
-            PromptSetEnabled(TradeWagon, true)
-            if Citizen.InvokeNative(0xE0F65F0640EF0617, TradeWagon) then  -- PromptHasHoldModeCompleted
+            if Citizen.InvokeNative(0xE0F65F0640EF0617, TradePrompt) then  -- PromptHasHoldModeCompleted
                 local serverId = GetPlayerServerId(closestPlayer)
-                local tradeComplete = VORPcore.Callback.TriggerAwait('bcc-wagons:SaveWagonTrade', serverId, MyWagonId)
+                local tradeComplete = Core.Callback.TriggerAwait('bcc-wagons:SaveWagonTrade', serverId, MyWagonId)
                 if tradeComplete then
                     ResetWagon()
                 end
                 Trading = false
+                PromptDelete(TradePrompt)
             end
         end
         Wait(sleep)
@@ -561,25 +657,25 @@ function GetClosestPlayer()
     return closestPlayer, closestDistance
 end
 
-function ResetWagon()
-    if MyWagon then
-        DeleteEntity(MyWagon)
-        MyWagon = nil
-    end
-    PromptsStarted = false
-    TargetReturn = nil
-    TargetTrade = nil
-    Trading = false
-end
-
-function LoadWagonModel(model, modelName)
-    if not IsModelValid(model) then
-        return print('Invalid model:', modelName)
-    end
-    RequestModel(model)
-    while not HasModelLoaded(model) do
+local function GetControlOfWagon()
+    while not NetworkHasControlOfEntity(MyWagon) do
+        NetworkRequestControlOfEntity(MyWagon)
         Wait(10)
     end
+end
+
+function ResetWagon()
+    if MyWagon ~= 0 then
+        GetControlOfWagon()
+        DeleteEntity(MyWagon)
+        MyWagon = 0
+    end
+    PromptDelete(WagonMenuPrompt)
+    PromptDelete(ActionPrompt)
+    PromptDelete(BrakePrompt)
+    PromptDelete(TradePrompt)
+    PromptsStarted = false
+    Trading = false
 end
 
 -- Camera to View Wagons
@@ -626,7 +722,7 @@ function Rotation(dir)
 end
 
 function CheckPlayerJob(wainwright, site)
-    local result = VORPcore.Callback.TriggerAwait('bcc-wagons:CheckJob', wainwright, site)
+    local result = Core.Callback.TriggerAwait('bcc-wagons:CheckJob', wainwright, site)
     if wainwright and result then
         IsWainwright = false
         if result[1] then
@@ -637,95 +733,111 @@ function CheckPlayerJob(wainwright, site)
         if result[1] then
             HasJob = true
         elseif Sites[site].shop.jobsEnabled then
-            VORPcore.NotifyRightTip(_U('needJob'), 4000)
+            Core.NotifyRightTip(_U('needJob'), 4000)
         end
         JobMatchedWagons = FindWagonsByJob(result[2])
     end
 end
 
 RegisterCommand(Config.commands.wagonEnter, function()
-    if MyWagon then
+    if MyWagon ~= 0 then
         DoScreenFadeOut(500)
         Wait(500)
         SetPedIntoVehicle(PlayerPedId(), MyWagon, -1)
         Wait(500)
         DoScreenFadeIn(500)
     else
-        VORPcore.NotifyRightTip(_U('noWagon'), 4000)
+        Core.NotifyRightTip(_U('noWagon'), 4000)
     end
-end)
+end, false)
 
 RegisterCommand(Config.commands.wagonReturn, function()
     if Config.returnEnabled then
         ReturnWagon()
     else
-        VORPcore.NotifyRightTip(_U('noReturn'), 4000)
+        Core.NotifyRightTip(_U('noReturn'), 4000)
     end
-end)
+end, false)
 
 function StartPrompts()
-    OpenShops = PromptRegisterBegin()
-    PromptSetControlAction(OpenShops, Config.keys.shop)
-    PromptSetText(OpenShops, CreateVarString(10, 'LITERAL_STRING', _U('shopPrompt')))
-    PromptSetVisible(OpenShops, true)
-    PromptSetStandardMode(OpenShops, true)
-    PromptSetGroup(OpenShops, PromptGroup, 0)
-    PromptRegisterEnd(OpenShops)
+    ShopPrompt = PromptRegisterBegin()
+    PromptSetControlAction(ShopPrompt, Config.keys.shop)
+    PromptSetText(ShopPrompt, CreateVarString(10, 'LITERAL_STRING', _U('shopPrompt')))
+    PromptSetVisible(ShopPrompt, true)
+    PromptSetStandardMode(ShopPrompt, true)
+    PromptSetGroup(ShopPrompt, ShopGroup, 0)
+    PromptRegisterEnd(ShopPrompt)
 
-    OpenReturn = PromptRegisterBegin()
-    PromptSetControlAction(OpenReturn, Config.keys.ret)
-    PromptSetText(OpenReturn, CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt')))
-    PromptSetVisible(OpenReturn, true)
-    PromptSetStandardMode(OpenReturn, true)
-    PromptSetGroup(OpenReturn, PromptGroup, 0)
-    PromptRegisterEnd(OpenReturn)
+    ReturnPrompt = PromptRegisterBegin()
+    PromptSetControlAction(ReturnPrompt, Config.keys.ret)
+    PromptSetText(ReturnPrompt, CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt')))
+    PromptSetVisible(ReturnPrompt, true)
+    PromptSetStandardMode(ReturnPrompt, true)
+    PromptSetGroup(ReturnPrompt, ShopGroup, 0)
+    PromptRegisterEnd(ReturnPrompt)
 
-    TradeWagon = PromptRegisterBegin()
-    PromptSetControlAction(TradeWagon, Config.keys.trade)
-    PromptSetText(TradeWagon, CreateVarString(10, 'LITERAL_STRING', _U('tradePrompt')))
-    PromptSetVisible(TradeWagon, true)
-    PromptSetHoldMode(TradeWagon, 2000)
-    PromptSetGroup(TradeWagon, TradeGroup, 0)
-    PromptRegisterEnd(TradeWagon)
-
-    LootWagon = PromptRegisterBegin()
-    PromptSetControlAction(LootWagon, Config.keys.loot)
-    PromptSetText(LootWagon, CreateVarString(10, 'LITERAL_STRING', _U('lootWagonPrompt')))
-    PromptSetVisible(LootWagon, true)
-    PromptSetEnabled(LootWagon, true)
-    PromptSetStandardMode(LootWagon)
-    PromptSetGroup(LootWagon, LootGroup, 0)
-    PromptRegisterEnd(LootWagon)
+    LootPrompt = PromptRegisterBegin()
+    PromptSetControlAction(LootPrompt, Config.keys.loot)
+    PromptSetText(LootPrompt, CreateVarString(10, 'LITERAL_STRING', _U('lootWagonPrompt')))
+    PromptSetVisible(LootPrompt, true)
+    PromptSetEnabled(LootPrompt, true)
+    PromptSetStandardMode(LootPrompt)
+    PromptSetGroup(LootPrompt, LootGroup, 0)
+    PromptRegisterEnd(LootPrompt)
 end
 
-AddEventHandler('bcc-wagons:TargetPrompts', function(wagonGroup)
-    if not PromptsStarted then
-        TargetReturn = PromptRegisterBegin()
-        PromptSetControlAction(TargetReturn, Config.keys.targetRet)
-        PromptSetText(TargetReturn, CreateVarString(10, 'LITERAL_STRING', _U('returnPrompt')))
-        PromptSetEnabled(TargetReturn, true)
-        PromptSetVisible(TargetReturn, true)
-        PromptSetStandardMode(TargetReturn, true)
-        PromptSetGroup(TargetReturn, wagonGroup)
-        PromptRegisterEnd(TargetReturn)
+function StartWagonPrompts()
+    WagonMenuPrompt = PromptRegisterBegin()
+    PromptSetControlAction(WagonMenuPrompt, Config.keys.menu)
+    PromptSetText(WagonMenuPrompt, CreateVarString(10, 'LITERAL_STRING', _U('wagonMenuPrompt')))
+    PromptSetEnabled(WagonMenuPrompt, true)
+    PromptSetVisible(WagonMenuPrompt, true)
+    PromptSetStandardMode(WagonMenuPrompt, true)
+    PromptSetGroup(WagonMenuPrompt, WagonGroup, 0)
+    PromptRegisterEnd(WagonMenuPrompt)
 
-        TargetTrade = PromptRegisterBegin()
-        PromptSetControlAction(TargetTrade, Config.keys.targetTrade)
-        PromptSetText(TargetTrade, CreateVarString(10, 'LITERAL_STRING', _U('targetTradePrompt')))
-        PromptSetEnabled(TargetTrade, true)
-        PromptSetVisible(TargetTrade, true)
-        PromptSetStandardMode(TargetTrade, true)
-        PromptSetGroup(TargetTrade, wagonGroup)
-        PromptRegisterEnd(TargetTrade)
+    BrakePrompt = PromptRegisterBegin()
+    PromptSetControlAction(BrakePrompt, Config.keys.brake)
+    if WagonCfg.brakeSet then
+        PromptSetText(BrakePrompt, CreateVarString(10, 'LITERAL_STRING', _U('brakeOff')))
+    else
+        PromptSetText(BrakePrompt, CreateVarString(10, 'LITERAL_STRING', _U('brakeOn')))
+    end
+    PromptSetEnabled(BrakePrompt, true)
+    PromptSetVisible(BrakePrompt, true)
+    PromptSetStandardMode(BrakePrompt, true)
+    PromptSetGroup(BrakePrompt, WagonGroup, 0)
+    PromptRegisterEnd(BrakePrompt)
+
+    ActionPrompt = PromptRegisterBegin()
+    PromptSetControlAction(ActionPrompt, Config.keys.action)
+    PromptSetText(ActionPrompt, CreateVarString(10, 'LITERAL_STRING', _U('wagonMenuPrompt')))
+    PromptSetEnabled(ActionPrompt, true)
+    PromptSetVisible(ActionPrompt, true)
+    PromptSetStandardMode(ActionPrompt, true)
+    PromptSetGroup(ActionPrompt, ActionGroup, 0)
+    PromptRegisterEnd(ActionPrompt)
+end
+
+function StartTradePrompts()
+    if not PromptsStarted then
+        TradePrompt = PromptRegisterBegin()
+        PromptSetControlAction(TradePrompt, Config.keys.trade)
+        PromptSetText(TradePrompt, CreateVarString(10, 'LITERAL_STRING', _U('tradePrompt')))
+        PromptSetEnabled(TradePrompt, true)
+        PromptSetVisible(TradePrompt, true)
+        PromptSetHoldMode(TradePrompt, 2000)
+        PromptSetGroup(TradePrompt, TradeGroup, 0)
+        PromptRegisterEnd(TradePrompt)
 
         PromptsStarted = true
     end
-end)
+end
 
 function ManageBlip(site, closed)
     local siteCfg = Sites[site]
 
-    if closed and not siteCfg.blip.show.closed then
+    if (closed and not siteCfg.blip.show.closed) or (not siteCfg.blip.show.open) then
         if Sites[site].Blip then
             RemoveBlip(Sites[site].Blip)
             Sites[site].Blip = nil
@@ -748,10 +860,10 @@ end
 function AddNPC(site)
     local siteCfg = Sites[site]
     if not siteCfg.NPC then
-        local modelName = siteCfg.npc.model
-        local model = joaat(modelName)
-        LoadModel(model, modelName)
-        siteCfg.NPC = CreatePed(model, siteCfg.npc.coords.x, siteCfg.npc.coords.y, siteCfg.npc.coords.z - 1.0, siteCfg.npc.heading, false, false, false, false)
+        local model = siteCfg.npc.model
+        local hash = joaat(model)
+        LoadModel(hash, model)
+        siteCfg.NPC = CreatePed(hash, siteCfg.npc.coords.x, siteCfg.npc.coords.y, siteCfg.npc.coords.z - 1.0, siteCfg.npc.heading, false, false, false, false)
         Citizen.InvokeNative(0x283978A15512B2FE, siteCfg.NPC, true) -- SetRandomOutfitVariation
         SetEntityCanBeDamaged(siteCfg.NPC, false)
         SetEntityInvincible(siteCfg.NPC, true)
@@ -769,12 +881,12 @@ function RemoveNPC(site)
     end
 end
 
-function LoadModel(model, modelName)
-    if not IsModelValid(model) then
-        return print('Invalid model:', modelName)
+function LoadModel(hash, model)
+    if not IsModelValid(hash) then
+        return print('Invalid model:', model)
     end
-    RequestModel(model)
-    while not HasModelLoaded(model) do
+    RequestModel(hash, false)
+    while not HasModelLoaded(hash) do
         Wait(10)
     end
 end
@@ -797,9 +909,9 @@ AddEventHandler('onResourceStop', function(resourceName)
         DeleteEntity(ShopEntity)
         ShopEntity = nil
     end
-    if MyWagon then
+    if MyWagon ~= 0 then
         DeleteEntity(MyWagon)
-        MyWagon = nil
+        MyWagon = 0
     end
 
     for _, siteCfg in pairs(Sites) do
@@ -869,32 +981,32 @@ end
 
  function FindWagonsByJob(job)
     local matchingWagons = {}
-    for _, wagonType in ipairs(Wagons) do
+    for _, wagonModels in ipairs(Wagons) do
         local matchingModels = {}
-        for wagonModel, wagonModelData in orderedPairs(wagonType.types) do
+        for wagonModel, wagonModelData in orderedPairs(wagonModels.types) do
             -- using maps to break a loop, though technically making another loop, albeit simpler. Preferably you already configure jobs as a map so that you could expand
-            -- perhaps when a request comes to have color accesses by job grade or similar
+            -- perhaps when a request comes to have model accesses by job grade or similar
             local wagonJobs = {}
             for _, wagonJob in pairs(wagonModelData.job) do
                 wagonJobs[wagonJob] = wagonJob
             end
-            -- add matching color directly 
+            -- add matching model directly 
             if wagonJobs[job] ~= nil then
                 matchingModels[wagonModel] = {
                     label = wagonModelData.label,
                     cashPrice = wagonModelData.cashPrice,
                     goldPrice = wagonModelData.goldPrice,
-                    invLimit = wagonModelData.invLimit,
+                    invLimit = wagonModelData.inventory.limit,
                     job = wagonModelData.job
                 }
             end
-            --handle case where there isn\t a job attached to horse color config
+            --handle case where there isn\t a job attached to wagon model config
             if len(wagonJobs) == 0 then
                 matchingModels[wagonModel] = {
                     label = wagonModelData.label,
                     cashPrice = wagonModelData.cashPrice,
                     goldPrice = wagonModelData.goldPrice,
-                    invLimit = wagonModelData.invLimit,
+                    invLimit = wagonModelData.inventory.limit,
                     job = nil
                 }
             end
@@ -902,7 +1014,7 @@ end
 
         if len(matchingModels) > 0 then
             matchingWagons[#matchingWagons + 1] = {
-                name = wagonType.name,
+                name = wagonModels.name,
                 types = matchingModels
             }
         end

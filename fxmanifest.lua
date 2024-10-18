@@ -5,20 +5,20 @@ game 'rdr3'
 lua54 'yes'
 author 'BCC @Apollyon'
 
-client_scripts {
-    'client/client.lua'
-}
-
-server_scripts {
-    '@oxmysql/lib/MySQL.lua',
-    'server/versioncheck.lua',
-    'server/server.lua'
-}
-
 shared_scripts {
     'configs/*.lua',
     'locale.lua',
     'languages/*.lua'
+}
+
+client_scripts {
+    'client/client.lua',
+    'client/menu.lua'
+}
+
+server_scripts {
+    '@oxmysql/lib/MySQL.lua',
+    'server/server.lua'
 }
 
 ui_page {
@@ -34,4 +34,4 @@ files {
     "ui/dist/style.css"
 }
 
-version '1.1.3'
+version '1.2.0'

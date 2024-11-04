@@ -415,21 +415,6 @@ if Config.outfitsAtWagon then
     
         TriggerClientEvent('vorpcharacter:updateCache', src, Outfit, CacheComps)]]--
     end)
-    
-    RegisterNetEvent("vorpcharacter:setPlayerCompChange", function(skinValues, compsValues)
-        local _source = source
-        local UserCharacter = Core.getUser(_source)
-        if UserCharacter then
-            local User = UserCharacter.getUsedCharacter
-            if compsValues then
-                User.updateComps(json.encode(compsValues))
-            end
-    
-            if skinValues then
-                User.updateSkin(json.encode(skinValues))
-            end
-        end
-    end)
 end
 
 Core.Callback.Register('bcc-wagons:CheckJob', function(source, cb, wainwright, site)

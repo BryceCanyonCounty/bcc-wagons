@@ -379,6 +379,59 @@ Core.Callback.Register('bcc-wagons:RepairWagon', function(source, cb, myWagonId,
     cb(updateLevel)
 end)
 
+if Config.outfitsAtWagon then
+
+    RegisterNetEvent('bcc-wagons:GetOutfits')
+    AddEventHandler('bcc-wagons:GetOutfits', function()
+        local src = source
+        local user = Core.getUser(source)
+        if not user then return end
+        local character = user.getUsedCharacter
+        local identifier = character.identifier
+        local charIdentifier = character.charIdentifier
+    
+        exports.oxmysql:execute("SELECT * FROM outfits WHERE `identifier` = ? AND `charidentifier` = ?", { identifier, charIdentifier }, function(result)
+            if result[1] then
+                TriggerClientEvent('bcc-wagons:LoadOutfits', src, { comps = character.comps, compTints = character.compTints }, result)
+            end
+        end)
+    end)
+
+    RegisterNetEvent('bcc-wagons:setOutfit')
+    AddEventHandler('bcc-wagons:setOutfit', function(Outfit, CacheComps)
+        local src = source
+        local user = Core.getUser(source)
+        if not user then return end
+        local character = user.getUsedCharacter
+            if CacheComps then
+                user.updateComps(json.encode(CacheComps))
+            end
+    
+            if Outfit then
+                user.updateSkin(json.encode(Outfit))
+            end
+        --[[character.updateComps(Outfit.comps)
+        character.updateCompTints(Outfit.compTints or '{}')
+    
+        TriggerClientEvent('vorpcharacter:updateCache', src, Outfit, CacheComps)]]--
+    end)
+    
+    RegisterNetEvent("vorpcharacter:setPlayerCompChange", function(skinValues, compsValues)
+        local _source = source
+        local UserCharacter = Core.getUser(_source)
+        if UserCharacter then
+            local User = UserCharacter.getUsedCharacter
+            if compsValues then
+                User.updateComps(json.encode(compsValues))
+            end
+    
+            if skinValues then
+                User.updateSkin(json.encode(skinValues))
+            end
+        end
+    end)
+end
+
 Core.Callback.Register('bcc-wagons:CheckJob', function(source, cb, wainwright, site)
     local src = source
     local user = Core.getUser(src)

@@ -75,6 +75,10 @@ Config.wainwrightJob = {
 }
 -----------------------------------------------------
 
+--- Character Outfits at wagon
+Config.outfitsAtWagon = false -- Set to true if you want outfits accessible at the wagon
+----------------------------------------------------
+
 Config.BlipColors = {
     LIGHT_BLUE    = 'BLIP_MODIFIER_MP_COLOR_1',
     DARK_RED      = 'BLIP_MODIFIER_MP_COLOR_2',

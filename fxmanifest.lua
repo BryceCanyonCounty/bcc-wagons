@@ -13,7 +13,9 @@ shared_scripts {
 
 client_scripts {
     'client/client.lua',
-    'client/menu.lua'
+    'client/menu.lua',
+    '@vorp_character/client/creator_functions.lua',
+    'client/menuOutfits.lua'
 }
 
 server_scripts {
@@ -34,4 +36,4 @@ files {
     "ui/dist/style.css"
 }
 
-version '1.2.0'
+version '1.3.0'

@@ -63,5 +63,8 @@ Locales["nl_lang"] = {
     confirm = "Confirm",
     submit = "Submit",
     brakeOn = "Set Brake",
-    brakeOff = "Release Brake"
+    brakeOff = "Release Brake",
+    wagonOutfits = "Outfits",
+    OutfitSubMenu = "Choose an outfit",
+    SelectOutfit = "Select outfit"
 }

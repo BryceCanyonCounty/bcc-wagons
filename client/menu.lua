@@ -119,7 +119,19 @@ function OpenWagonMenu()
             Core.NotifyRightTip(_U('exitWagon'), 4000)
         end
     end)
-
+	
+    if Config.outfitsAtWagon then
+        MainPage:RegisterElement('button', {
+            label = _U('wagonOutfits'),
+            slot = 'content',
+            style = {
+                ['color'] = '#E0E0E0'
+            }
+        }, function()
+            TriggerServerEvent('bcc-wagons:GetOutfits')
+        end)
+    end
+	
     MainPage:RegisterElement('line', {
         slot = 'footer',
         style = {}

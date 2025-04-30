@@ -30,7 +30,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 50,     -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,  -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -62,7 +88,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 50,     -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,  -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -94,7 +146,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 50,     -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,  -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -132,7 +210,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 100,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,  -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -164,7 +268,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 100,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,  -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -196,7 +326,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 100,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -228,7 +384,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 100,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -266,7 +448,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -298,7 +506,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -330,7 +564,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -362,7 +622,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -394,7 +680,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -426,7 +738,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -458,7 +796,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -490,7 +854,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 200,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -528,7 +918,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -560,7 +976,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -592,7 +1034,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -624,7 +1092,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -656,7 +1150,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -688,7 +1208,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -720,7 +1266,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -752,7 +1324,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}
@@ -784,7 +1382,33 @@ Wagons = { -- Gold to Dollar Ratio Based on 1899 Gold Price / sellPrice is 60% o
                     enabled = true, -- Set false to Disable Inventory
                     limit = 400,    -- Maximum Inventory Limit
                     weapons = true, -- Set false to Disable Weapons
-                    shared = true   -- Set false to Disable Shared Inventory
+                    shared = true,   -- Set false to Disable Shared Inventory
+                    whitelistWeapons = false, -- Default: false / Set to true to Enable White List for Weapons
+                    weaponsLimitWhiteList = {
+                        -- { name = 'WEAPON_MELEE_TORCH', limit = 1, },
+                    },
+                    useBlackList = false, -- Default: false / Set to false to Disable
+                    itemsBlackList = {
+                        -- 'food_delivery1',
+                        -- 'food_delivery2',
+                        -- 'food_delivery3',
+                    },
+                    ignoreItemStackLimit = true, -- Default: true / Set to true to Ignore Item Stack Limit
+                    useWhiteList = false, -- Default: false / Set to true to Enable White List
+                    itemsLimitWhiteList = {
+                        -- { name = 'diamond', limit = 10, },
+                    },
+                    usePermissions = false, -- Default: false / Set to true to Enable Permissions
+                    permissions = {
+                        allowedJobsTakeFrom = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                        allowedJobsMoveTo = {
+                            -- { name = "police", grade = 0 },
+                            -- { name = "sheriff", grade = 0 },
+                        },
+                    },
                 },
                 -- Only Players with Specified Job will See that wagon to Purchase in the Shop Menu
                 job = {} -- Job Example: {'police', 'doctor'}

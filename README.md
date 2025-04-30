@@ -6,31 +6,27 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 
 ## Features
 
-- Buy and sell wagons through the wagon shops
-- Cash and/or gold may be used for payments in the menu
-- Individual inventory for owned wagons
-- Call your selected wagon using the `J` key
-- Shop hours may be set individually for each shop or disabled to allow the shop to remain open
-- Shop blips are colored and changeable per shop location
-- Blips can change color reflecting if shop is open, closed or job locked
-- Shop access can be limited by job and jobgrade
-- Wagons can be returned at any shop location via prompt
-- Return your wagon when afield by using the menu
-- Give your wagon a special name at purchase time (rename wagon using the menu)
-- Set a max number of wagons per player and wainwrights in the main config
-- Distance-based NPC spawns
-- Trade wagons with other players using the menu
-- Limit individual wagon purchases to a specified job
-- Wainwright job can sell wagons to players (more to come!)
-- Shared inventory option. Allows wagon inventories to be looted when wagon is empty of players
-- Wagon condition reduces while the wagon is spawned
-  - Repair your wagon with the repair item (default: hammer / set in config)
-  - Repair item can be used to repair both wagons and boats (if using bcc-boats)
-  - Durability of repair item reduces with each use
+- **Wagon Shopping**: Buy and sell wagons through the wagon shops.
+- **Payment Options**: Use cash and/or gold for payments in the menu.
+- **Personal Inventory**: Each owned wagon has its own inventory.
+- **Wagon Calling**: Call your selected wagon using the `J` key.
+- **Custom Shop Hours**: Set individual shop hours or disable them to keep the shop open.
+- **Customizable Blips**: Shop blips are colored and changeable per shop location, reflecting open, closed, or job-locked status.
+- **Job-Based Access**: Limit shop access by job and job grade.
+- **Wagon Return**: Return your wagon at any shop location via prompt or use the menu when afield.
+- **Wagon Naming**: Give your wagon a special name at purchase time or rename it using the menu.
+- **Configurable Limits**: Set a max number of wagons per player and wainwrights in the main config.
+- **NPC Spawns**: Distance-based NPC spawns for a more immersive experience.
+- **Wagon Trading**: Trade wagons with other players using the menu.
+- **Job-Specific Purchases**: Limit individual wagon purchases to specified jobs.
+- **Wainwright Job**: Allows the wainwright job to sell wagons to players (more features to come!).
+- **Shared Inventory Option**: Allows wagon inventories to be looted when the wagon is empty of players.
+- **Wagon Condition**: Wagon condition reduces while spawned. Repair your wagon with the repair item (default: hammer, configurable). The repair item can also repair boats if using `bcc-boats`. The durability of the repair item reduces with each use.
 
 ## Commands
-- Command `/wagonEnter` if you have trouble getting to your wagon
-- Command `/wagonReturn` to return wagon when away from a shop (if enabled in config)
+
+- `/wagonEnter`: Use this command if you have trouble getting to your wagon.
+- `/wagonReturn`: Return your wagon when away from a shop (if enabled in the config).
 
 ## Dependencies
 
@@ -40,16 +36,18 @@ Whether you're a hardworking farmer tending to your crops, a family embarking on
 
 ## Installation
 
-- Make sure dependencies are installed/updated and ensured before this script
-- Add `bcc-wagons` folder to your resources folder
-- Add `ensure bcc-wagons` to your `resources.cfg`
-- Run the included database file `wagons.sql`
-- Restart Server
+1. Ensure dependencies are installed/updated and ensured before this script.
+2. Add the `bcc-wagons` folder to your resources folder.
+3. Add `ensure bcc-wagons` to your `server.cfg`.
+4. Run the included database file `wagons.sql`.
+5. Restart the server.
 
 ## Credits
-- lrp_stable
-- [ByteSizd](https://github.com/AndrewR3K) - Vue Boilerplate for RedM
-- [SavSin](https://github.com/DavFount) - UI conversion to VueJS
+
+- **lrp_stable**
+- **[ByteSizd](https://github.com/AndrewR3K)**: Vue Boilerplate for RedM
+- **[SavSin](https://github.com/DavFount)**: UI conversion to VueJS
 
 ## GitHub
-- https://github.com/BryceCanyonCounty/bcc-wagons
+
+- [bcc-wagons](https://github.com/BryceCanyonCounty/bcc-wagons)

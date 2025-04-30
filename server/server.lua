@@ -93,7 +93,7 @@ Core.Callback.Register('bcc-wagons:UpdateWagonName', function(source, cb, wagonI
     cb(true)
 end)
 
-RegisterServerEvent('bcc-wagons:SelectWagon', function(data)
+RegisterNetEvent('bcc-wagons:SelectWagon', function(data)
     local src = source
     local user = Core.getUser(src)
     if not user then return end
@@ -221,35 +221,68 @@ Core.Callback.Register('bcc-wagons:SaveWagonTrade', function(source, cb, serverI
     cb(true)
 end)
 
-RegisterServerEvent('bcc-wagons:RegisterInventory', function(id, wagonModel)
+RegisterNetEvent('bcc-wagons:RegisterInventory', function(id, wagonModel)
+    local idStr = 'wagon_' .. tostring(id)
     local src = source
     local user = Core.getUser(src)
     if not user then return end
-    local isRegistered = exports.vorp_inventory:isCustomInventoryRegistered('wagon_' .. tostring(id))
-    if isRegistered then return end
+    local isRegistered = exports.vorp_inventory:isCustomInventoryRegistered(idStr)
 
     for _, wagonModels in pairs(Wagons) do
         for model, wagonConfig in pairs(wagonModels.types) do
             if model == wagonModel then
                 local data = {
-                    id = 'wagon_' .. tostring(id),
+                    id = idStr,
                     name = _U('wagonInv'),
                     limit = tonumber(wagonConfig.inventory.limit),
                     acceptWeapons = wagonConfig.inventory.weapons,
                     shared = wagonConfig.inventory.shared,
-                    ignoreItemStackLimit = true,
-                    whitelistItems = false,
-                    UsePermissions = false,
-                    UseBlackList = false,
-                    whitelistWeapons = false
+                    ignoreItemStackLimit = wagonConfig.inventory.ignoreItemStackLimit or true,
+                    whitelistItems = wagonConfig.inventory.useWhiteList or false,
+                    UsePermissions = wagonConfig.inventory.usePermissions or false,
+                    UseBlackList = wagonConfig.inventory.useBlackList or false,
+                    whitelistWeapons = wagonConfig.inventory.whitelistWeapons or false,
                 }
-                exports.vorp_inventory:registerInventory(data)
+
+                if isRegistered then
+                    exports.vorp_inventory:updateCustomInventoryData(idStr, data)
+                else
+                    exports.vorp_inventory:registerInventory(data)
+                end
+
+                if data.UsePermissions then
+                    for _, permission in ipairs(wagonConfig.inventory.permissions.allowedJobsTakeFrom) do
+                        exports.vorp_inventory:AddPermissionTakeFromCustom(idStr, permission.name, permission.grade)
+                    end
+                    for _, permission in ipairs(wagonConfig.inventory.permissions.allowedJobsMoveTo) do
+                        exports.vorp_inventory:AddPermissionMoveToCustom(idStr, permission.name, permission.grade)
+                    end
+                end
+
+                if data.whitelistItems then
+                    for _, item in ipairs(wagonConfig.inventory.itemsLimitWhiteList) do
+                        exports.vorp_inventory:setCustomInventoryItemLimit(idStr, item.name, item.limit)
+                    end
+                end
+
+                if data.whitelistWeapons then
+                    for _, weapon in ipairs(wagonConfig.inventory.weaponsLimitWhiteList) do
+                        exports.vorp_inventory:setCustomInventoryWeaponLimit(idStr, weapon.name, weapon.limit)
+                    end
+                end
+
+                if data.UseBlackList then
+                    for _, item in ipairs(wagonConfig.inventory.itemsBlackList) do
+                        exports.vorp_inventory:BlackListCustomAny(idStr, item)
+                    end
+                end
+                break
             end
         end
     end
 end)
 
-RegisterServerEvent('bcc-wagons:OpenInventory', function(id)
+RegisterNetEvent('bcc-wagons:OpenInventory', function(id)
     local src = source
     local user = Core.getUser(src)
     if not user then return end
@@ -381,15 +414,14 @@ end)
 
 if Config.outfitsAtWagon then
 
-    RegisterNetEvent('bcc-wagons:GetOutfits')
-    AddEventHandler('bcc-wagons:GetOutfits', function()
+    RegisterNetEvent('bcc-wagons:GetOutfits', function()
         local src = source
-        local user = Core.getUser(source)
+        local user = Core.getUser(src)
         if not user then return end
         local character = user.getUsedCharacter
         local identifier = character.identifier
         local charIdentifier = character.charIdentifier
-    
+
         exports.oxmysql:execute("SELECT * FROM outfits WHERE `identifier` = ? AND `charidentifier` = ?", { identifier, charIdentifier }, function(result)
             if result[1] then
                 TriggerClientEvent('bcc-wagons:LoadOutfits', src, { comps = character.comps, compTints = character.compTints }, result)
@@ -397,16 +429,15 @@ if Config.outfitsAtWagon then
         end)
     end)
 
-    RegisterNetEvent('bcc-wagons:setOutfit')
-    AddEventHandler('bcc-wagons:setOutfit', function(Outfit, CacheComps)
+    RegisterNetEvent('bcc-wagons:setOutfit', function(Outfit, CacheComps)
         local src = source
-        local user = Core.getUser(source)
+        local user = Core.getUser(src)
         if not user then return end
         local character = user.getUsedCharacter
             if CacheComps then
                 user.updateComps(json.encode(CacheComps))
             end
-    
+
             if Outfit then
                 user.updateSkin(json.encode(Outfit))
             end
